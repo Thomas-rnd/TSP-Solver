@@ -23,6 +23,7 @@ def tour_optimal(fichier='../data/ulysses22_opt_tour.txt'):
         data = [line.replace('\n', '') for line in input.readlines()]
     # -1 pour rester en correspondance avec le dataframe ville de 0 à n-1
     tour_optimal = [int(i)-1 for i in data]
+    tour_optimal.append(tour_optimal[0])
     return tour_optimal
 
 
