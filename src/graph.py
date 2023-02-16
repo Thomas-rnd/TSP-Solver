@@ -39,6 +39,7 @@ def affichage(resolution, data):
     print("Analyse de la performance de l'algorithme :",
           resolution["Algorithme"])
     print("=============================================")
+    print("Nombre de ville : ", resolution["Nombre de villes"])
     print("Pourcentage d'erreur : ", resolution["Erreur (en %)"])
     print("Temps de calcul (en s): ", resolution["Temps de calcul (en s)"])
     print("=============================================")
