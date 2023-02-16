@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from testData import trajet_en_df
+
 
 def representation_itineraire(data):
     """Affichage des N villes par des points ainsi que le parcours réalisé
@@ -18,3 +20,25 @@ def representation_itineraire(data):
     # Pour une visualisation plus proche de la réalité
     # plt.axis("equal")
     plt.show()
+
+
+def affichage(resolution, data):
+    """Affichage d'un trajet
+
+    Parameters
+    ----------
+    resolution : dict
+        variable stockant un ensemble de variables importantes pour analyser
+        l'algorithme
+    data : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    """
+    df_meilleur_trajet = trajet_en_df(resolution['Chemins'][-1], data)
+    representation_itineraire(df_meilleur_trajet)
+
+    print("Analyse de la performance de l'algorithme :",
+          resolution["Algorithme"])
+    print("=============================================")
+    print("Pourcentage d'erreur : ", resolution["Erreur (en %)"])
+    print("Temps de calcul (en s): ", resolution["Temps de calcul (en s)"])
+    print("=============================================")
