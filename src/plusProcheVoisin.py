@@ -1,5 +1,5 @@
-from testData import trajet_en_df
 from graph import representation_itineraire
+from testData import trajet_en_df
 
 
 def plus_proche_voisin(data, matrice_distance):
