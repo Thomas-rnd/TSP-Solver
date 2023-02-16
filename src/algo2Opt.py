@@ -146,7 +146,7 @@ def main(matrice_distance, chemin_initial, chemin_optimal=[]):
             chemin_optimal, matrice_distance)
 
     resolution = {
-        'Nombre de villes': len(chemin_optimal),
+        'Nombre de villes': len(chemin_initial),
         'Algorithme': 'Algorithme 2-opt',
         'Distance': 'Euclidienne-2D',
         'Chemins': [],
