@@ -6,7 +6,13 @@ from testData import trajet_en_df
 
 def representation_itineraire(data):
     """Affichage des N villes par des points ainsi que le parcours réalisé
-       Le parcours est donné par l'ordre des villes dans le dataframe"""
+       Le parcours est donné par l'ordre des villes dans le dataframe
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    """
     # Affichage des points
     plt.scatter(data.iloc[0, :], data.iloc[1, :], zorder=1)
     # Repérage du point initial par un cercle rouge
@@ -23,7 +29,7 @@ def representation_itineraire(data):
 
 
 def affichage(resolution, data):
-    """Affichage d'un trajet
+    """Affichage d'un trajet et des performances d'un algorithme
 
     Parameters
     ----------
