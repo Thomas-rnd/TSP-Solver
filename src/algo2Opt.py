@@ -90,8 +90,11 @@ def deux_opt(itineraire_initial, matrice_distance):
 
     Returns
     -------
-    list
-        Le chemin sub-optimal trouvé
+    chemin_explores : list
+        L'ensemble des chemins sub-optimal trouvés
+    temps_calcul : int
+        temps necessaire à la résolution du problème
+
     """
     start_time = time.time()
 
@@ -149,17 +152,23 @@ def main(matrice_distance, chemin_initial, chemin_optimal=[]):
         'Nombre de villes': len(chemin_initial),
         'Algorithme': 'Algorithme 2-opt',
         'Distance': 'Euclidienne-2D',
+        # Stockage de l'ensemble des chemins explorés pour un affichage plus poussé
         'Chemins': [],
         'Chemin optimal': chemin_optimal,
+        # Erreur par rapport à la solution optimal de la TSPLIB
         'Erreur (en %)': 0,
         'Temps de calcul (en s)': 0
     }
 
     chemin_explores, temps_calcul = deux_opt(chemin_initial, matrice_distance)
 
+    # Ajout des chemins explorés au dictionnaire retourné
     resolution['Chemins'].extend(chemin_explores)
+    # Calcul de la distance du trajet final trouvé par l'algorithme. En dernière position
+    # de la variable précédente
     distance_chemin_sub_optimal = distance_trajet(
         resolution['Chemins'][-1], matrice_distance)
+    # Calcul de l'erreur si un chemin optimal est renseigné
     if chemin_optimal != []:
         erreur = 100*(distance_chemin_sub_optimal -
                       distance_chemin_optimal)/distance_chemin_optimal
