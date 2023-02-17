@@ -2,9 +2,10 @@ from algo2Opt import main
 from distance import matrice_distance
 from plusProcheVoisin import plus_proche_voisin
 from testData import data_TSPLIB, tour_optimal
+from graph import affichage
 
 ensemble_test = ['ulysses22', 'att48', 'berlin52',
-                 'st70', 'kroC100', 'gr202', 'ts225', 'a280']
+                 'st70', 'kroC100', 'ch150', 'gr202', 'tsp225']
 
 
 def test_global():
@@ -24,5 +25,7 @@ def test_global():
         cheminInitial = plus_proche_voisin(data, mat_distance)
 
         # Lancement de l'algorithme 2-opt
-        resultats_test.append(main(mat_distance, cheminInitial))
+        res = main(mat_distance, cheminInitial, chemin)
+        resultats_test.append(res)
+        affichage(res, data)
     return (resultats_test)
