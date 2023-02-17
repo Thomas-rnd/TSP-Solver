@@ -94,7 +94,6 @@ def deux_opt(itineraire_initial, matrice_distance):
         L'ensemble des chemins sub-optimal trouvés
     temps_calcul : int
         temps necessaire à la résolution du problème
-
     """
     start_time = time.time()
 

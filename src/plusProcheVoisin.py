@@ -9,9 +9,25 @@ from testData import data_TSPLIB, tour_optimal, trajet_en_df
 
 def plus_proche_voisin(data, matrice_distance):
     """Retourne le trajet trouvé en se déplacement de proche en proche.
-    La ville de départ étant arbitraire je choisis la ville d'index 0"""
+    La ville de départ étant arbitraire on choisit la ville d'index 0
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    matrice_distance : list
+        matrice stockant l'integralité des distances inter villes
+
+    Returns
+    -------
+    chemin_explores : list
+        L'ensemble des sous chemins empruntés pour arriver au résulat
+    temps_calcul : int
+        temps necessaire à la résolution du problème
+    """
     start_time = time.time()
 
+    # Stockage de la progression de l'exploration
     chemin_explore = []
     itineraire = [0]
     while len(data.loc['x']) != len(itineraire):
@@ -31,6 +47,7 @@ def plus_proche_voisin(data, matrice_distance):
         itineraire.append(
             matrice_distance[itineraire[-1]].index(distances[i]))
         chemin_explore.append(itineraire)
+    # On fait attention à fermer le cycle
     itineraire.append(itineraire[0])
 
     temps_calcul = time.time() - start_time
@@ -70,12 +87,17 @@ def main(data, matrice_distance, chemin_optimal=[]):
         'Temps de calcul (en s)': 0
     }
 
+    # Lancement de l'algorithme de recherche
     chemin_explore, temps_calcul = plus_proche_voisin(
         data, matrice_distance)
 
+    # Ajout des chemins explorés
     resolution['Chemins'].extend(chemin_explore)
+    # Le trajet finalement trouvé se trouve en dernière position
     distance_chemin_sub_optimal = distance_trajet(
         resolution['Chemins'][-1], matrice_distance)
+
+    # Calcul de l'erreur réalisé si le chemin optimal est renseigné
     if chemin_optimal != []:
         erreur = 100*(distance_chemin_sub_optimal -
                       distance_chemin_optimal)/distance_chemin_optimal
