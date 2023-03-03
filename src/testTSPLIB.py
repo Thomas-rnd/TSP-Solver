@@ -3,7 +3,8 @@ from distance import matrice_distance
 import plusProcheVoisin
 import geneticAlgorithm
 from testData import data_TSPLIB, tour_optimal
-from graph import affichage
+from graph import affichage, representation_temps_calcul, representation_itineraire_web
+import pandas as pd
 
 # Nom des data de test
 ENSEMBLE_TEST = ['ulysses22', 'att48', 'berlin52',
@@ -15,10 +16,18 @@ def test_global_2_opt():
 
     Returns
     -------
-    list
-        Elle stocke l'ensemble des dictionnaires renvoyés par l'algorithmes testé
+    Dataframe
+        variable stockant un ensemble de variables importantes pour analyser
+        l'algorithme
     """
-    resultats_test = []
+    # Dataframe à retourner, une ligne représente un test de l'algorithme
+    df_resultat_test = pd.DataFrame({
+        'Nombre de villes': [],
+        'Solution': [],
+        # Erreur par rapport à la solution optimal de la TSPLIB
+        'Erreur (en %)': [],
+        'Temps de calcul (en s)': []
+    })
 
     for i in ENSEMBLE_TEST:
         # Initialisation du data frame avec TSPLIB
@@ -37,12 +46,14 @@ def test_global_2_opt():
             data, mat_distance)
 
         # Lancement de l'algorithme 2-opt
-        res = algo2Opt.main(mat_distance, cheminInitial[-1], chemin_optimal)
-        resultats_test.append(res)
+        df_res = algo2Opt.main(mat_distance, cheminInitial[-1], chemin_optimal)
 
-        # Affichage console des résultats obtenu sur un jeu de donnée
-        affichage(res, data)
-    return (resultats_test)
+        # Affichage des résultats obtenu sur un jeu de donnée
+        affichage(df_res, data)
+        df_resultat_test = pd.concat(
+            [df_resultat_test, df_res], ignore_index=True)
+    representation_temps_calcul(df_resultat_test)
+    return (df_resultat_test)
 
 
 def test_global_plus_proche_voisin():
