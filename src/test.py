@@ -1,4 +1,3 @@
-from github import pygame_simulation
+from testTSPLIB import test_global_plus_proche_voisin, test_global_2_opt, test_global_algo_genetique
 
-pygame_simulation(tour=2, dist_ratio=4, fs=(1.5, 1, 0.75, 0.5, 0.25),
-                  max_iter=12000, alpha=0.99, beta=0.90)
+resultats_test_2_opt = test_global_2_opt()
