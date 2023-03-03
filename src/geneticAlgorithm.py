@@ -7,7 +7,7 @@ import numpy
 import pandas as pd
 
 from distance import distance_trajet, matrice_distance
-from graph import affichage, representation_itineraire
+from graph import affichage
 from testData import data_TSPLIB, tour_optimal, trajet_en_df
 
 # Taille de la population initiale

@@ -3,7 +3,7 @@ import time
 import numpy as np
 
 from distance import distance_trajet
-from graph import representation_itineraire, affichage
+from graph import affichage
 from testData import data_TSPLIB, tour_optimal, trajet_en_df
 
 

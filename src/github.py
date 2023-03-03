@@ -3,7 +3,6 @@ import time
 import math
 
 from distance import distance_euclidienne, distance_trajet
-from graph import representation_itineraire
 from testData import data_TSPLIB
 from distance import matrice_distance
 
