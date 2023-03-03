@@ -79,6 +79,5 @@ def trajet_en_df(trajet, data):
     # Récupération des coordonnées des villes pour pouvoir les afficher
     x = [data.iloc[0, i] for i in trajet]
     y = [data.iloc[1, i] for i in trajet]
-    array = numpy.array([x, y])
-    data = pd.DataFrame(array, index=['x', 'y'])
+    data = pd.DataFrame({'x': x, 'y': y})
     return (data)
