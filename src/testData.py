@@ -66,8 +66,10 @@ def trajet_en_df(trajet, data):
 
     Parameters
     ----------
-    fichier : string
-        nom du fichier à traiter
+    trajet : list
+        list ordonne de villes
+    data : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
 
     Returns
     -------

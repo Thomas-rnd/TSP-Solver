@@ -32,5 +32,5 @@ def init_random_df(n):
             y.append(b)
     array = numpy.array([x, y])
     # Initialisation du dataframe
-    data = pd.DataFrame(array, index=['x', 'y'])
+    data = pd.DataFrame({'x': x, 'y': y})
     return (data)

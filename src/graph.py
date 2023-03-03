@@ -4,7 +4,7 @@ import pandas as pd
 from testData import trajet_en_df
 
 
-def representation_itineraire(data):
+def representation_itineraire(data, reseau_neurones=[]):
     """Affichage des N villes par des points ainsi que le parcours réalisé
        Le parcours est donné par l'ordre des villes dans le dataframe
 
@@ -12,6 +12,8 @@ def representation_itineraire(data):
     ----------
     data : DataFrame
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    reseau_neurones : list
+        list stockant un réseau de neurone de kohonen
     """
     # Affichage des points
     plt.scatter(data.iloc[0, :], data.iloc[1, :], zorder=1)
@@ -20,11 +22,21 @@ def representation_itineraire(data):
                 color="red", marker='o', label='Point de Départ')
     plt.legend(loc="upper right")
 
-    # Affichage des traits
-    plt.plot(data.iloc[0, :], data.iloc[1, :], zorder=1)
-    plt.title('Chemin parcouru par le marchand', loc='center',)
-    # Pour une visualisation plus proche de la réalité
-    # plt.axis("equal")
+    if (reseau_neurones == []):
+        # Affichage des traits
+        plt.plot(data.iloc[0, :], data.iloc[1, :], zorder=1)
+        plt.title('Chemin parcouru par le marchand', loc='center')
+        # Pour une visualisation plus proche de la réalité
+        # plt.axis("equal")
+    else:
+        x = [neurone[0] for neurone in reseau_neurones]
+        y = [neurone[1] for neurone in reseau_neurones]
+        # Affichage des neurones
+        plt.scatter(x, y, zorder=1,
+                    color="green", marker='x', label='Réseau de Kohonen')
+        # Affichage des traits
+        plt.plot(x, y, zorder=1)
+        plt.title('Chemin parcouru par le réseau', loc='center')
     plt.show()
 
 
