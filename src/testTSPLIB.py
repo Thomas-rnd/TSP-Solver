@@ -57,14 +57,22 @@ def test_global_2_opt():
 
 
 def test_global_plus_proche_voisin():
-    """Lancement des tests de l'algorithme 2-opt
+    """Lancement des tests de l'algorithme plus proche voisin
 
     Returns
     -------
-    list
-        Elle stocke l'ensemble des dictionnaires renvoyés par l'algorithmes testé
+    Dataframe
+        variable stockant un ensemble de variables importantes pour analyser
+        l'algorithme
     """
-    resultats_test = []
+    # Dataframe à retourner, une ligne représente un test de l'algorithme
+    df_resultat_test = pd.DataFrame({
+        'Nombre de villes': [],
+        'Solution': [],
+        # Erreur par rapport à la solution optimal de la TSPLIB
+        'Erreur (en %)': [],
+        'Temps de calcul (en s)': []
+    })
 
     for i in ENSEMBLE_TEST:
         # Initialisation du data frame avec TSPLIB
@@ -77,23 +85,33 @@ def test_global_plus_proche_voisin():
         chemin_optimal = tour_optimal(f'../data/{i}_opt_tour.txt')
 
         # Lancement de l'algorithme plus proche voisin
-        res = plusProcheVoisin.main(data, mat_distance, chemin_optimal)
-        resultats_test.append(res)
+        df_res = plusProcheVoisin.main(data, mat_distance, chemin_optimal)
 
-        # Affichage console des résultats obtenu sur un jeu de donnée
-        affichage(res, data)
-    return (resultats_test)
+        # Affichage des résultats obtenu sur un jeu de donnée
+        affichage(df_res, data)
+        df_resultat_test = pd.concat(
+            [df_resultat_test, df_res], ignore_index=True)
+    representation_temps_calcul(df_resultat_test)
+    return (df_resultat_test)
 
 
 def test_global_algo_genetique():
-    """Lancement des tests de l'algorithme génétique
+    """Lancement des tests de l'algorithme plus proche voisin
 
     Returns
     -------
-    list
-        Elle stocke l'ensemble des dictionnaires renvoyés par l'algorithmes testé
+    Dataframe
+        variable stockant un ensemble de variables importantes pour analyser
+        l'algorithme
     """
-    resultats_test = []
+    # Dataframe à retourner, une ligne représente un test de l'algorithme
+    df_resultat_test = pd.DataFrame({
+        'Nombre de villes': [],
+        'Solution': [],
+        # Erreur par rapport à la solution optimal de la TSPLIB
+        'Erreur (en %)': [],
+        'Temps de calcul (en s)': []
+    })
 
     for i in ENSEMBLE_TEST:
         # Initialisation du data frame avec TSPLIB
@@ -106,9 +124,11 @@ def test_global_algo_genetique():
         chemin_optimal = tour_optimal(f'../data/{i}_opt_tour.txt')
 
         # Lancement de l'algorithme plus proche voisin
-        res = geneticAlgorithm.main(data, mat_distance, chemin_optimal)
-        resultats_test.append(res)
+        df_res = geneticAlgorithm.main(data, mat_distance, chemin_optimal)
 
-        # Affichage console des résultats obtenu sur un jeu de donnée
-        affichage(res, data)
-    return (resultats_test)
+        # Affichage des résultats obtenu sur un jeu de donnée
+        affichage(df_res, data)
+        df_resultat_test = pd.concat(
+            [df_resultat_test, df_res], ignore_index=True)
+    representation_temps_calcul(df_resultat_test)
+    return (df_resultat_test)

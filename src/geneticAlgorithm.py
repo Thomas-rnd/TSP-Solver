@@ -14,7 +14,7 @@ from testData import data_TSPLIB, tour_optimal, trajet_en_df
 NOMBRE_TRAJET = 1000
 
 # Pourcentage de population conservé à chaque épisode
-POURCENTAGE_SELECTION = 20/100
+POURCENTAGE_SELECTION = 10/100
 
 # Pourcentage de mutation
 POURCENTAGE_MUTATION = 25/100
@@ -285,7 +285,7 @@ def main(data, matrice_distance, chemin_optimal):
 
     Returns
     -------
-    dict
+    Dataframe
         variable stockant un ensemble de variables importantes pour analyser
         l'algorithme
     """
@@ -295,31 +295,19 @@ def main(data, matrice_distance, chemin_optimal):
     # Initialisation de n individus initiaux (Génèse)
     trajets_initiaux = init_population(NOMBRE_TRAJET, data, matrice_distance)
 
-    # Formalisme de stockage des résulats de l'algorithme
-    resolution = {
-        'Nombre de villes': len(chemin_optimal),
-        'Algorithme': 'Algorithme génétique',
-        'Distance': 'Euclidienne-2D',
-        'Chemins': [],
-        'Chemin optimal': chemin_optimal,
-        'Erreur (en %)': [100],
-        'Temps de calcul (en s)': 0
-    }
+    # Initialisation de l'erreur initiale à 100%
+    erreur = 100
 
     # Evaluation du temps de calcul
     start = time.time()
     # On arrète l'algorithme quand une approximation du chemin optimal est atteinte
-    while resolution['Erreur (en %)'][-1] > ERREUR_SUR_CHEMIN:
+    while erreur > ERREUR_SUR_CHEMIN:
         # Tri
         trajets_ordonnes = individus_ordonnes(trajets_initiaux)
-
-        # Ajout du meilleur trajet au résultat final
-        resolution['Chemins'].append(trajets_ordonnes[0]['Villes'])
 
         # Erreur relative de ce chemin
         erreur = 100*(trajets_ordonnes[0]['Distance'] -
                       distance_chemin_optimal)/distance_chemin_optimal
-        resolution['Erreur (en %)'].append(erreur)
 
         # Sélection
         meilleurs_trajets = selection(trajets_ordonnes, POURCENTAGE_SELECTION)
@@ -328,5 +316,18 @@ def main(data, matrice_distance, chemin_optimal):
         trajets_initiaux = generation(
             meilleurs_trajets, NOMBRE_TRAJET, POURCENTAGE_MUTATION, matrice_distance)
 
-    resolution['Temps de calcul (en s)'] = time.time() - start
-    return resolution
+     # Chemin final trouvé
+    solution = meilleurs_trajets[0]['Villes']
+    temps_calcul = time.time() - start
+
+    # Création du dataframe à retourner
+    df_resultat_test = pd.DataFrame({
+        'Nombre de villes': len(solution),
+        # Dans un tableau pour être sur une seule ligne du dataframe
+        'Solution': [solution],
+        # Erreur par rapport à la solution optimal de la TSPLIB
+        'Erreur (en %)': erreur,
+        'Temps de calcul (en s)': temps_calcul
+    })
+
+    return df_resultat_test

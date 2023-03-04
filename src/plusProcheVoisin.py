@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+import pandas as pd
 
 from distance import distance_trajet
 from graph import affichage
@@ -69,40 +70,38 @@ def main(data, matrice_distance, chemin_optimal=[]):
 
     Returns
     -------
-    dict
+    Dataframe
         variable stockant un ensemble de variables importantes pour analyser
         l'algorithme
     """
+
     if chemin_optimal != []:
         distance_chemin_optimal = distance_trajet(
             chemin_optimal, matrice_distance)
 
-    resolution = {
-        'Nombre de villes': 0,
-        'Algorithme': 'Algorithme du plus proche voisin',
-        'Distance': 'Euclidienne-2D',
-        'Chemins': [],
-        'Chemin optimal': chemin_optimal,
-        'Erreur (en %)': 0,
-        'Temps de calcul (en s)': 0
-    }
+    # On récupère les chemins testés et le temps de résolution de l'algorithme
+    chemin_explores, temps_calcul = plus_proche_voisin(data, matrice_distance)
 
-    # Lancement de l'algorithme de recherche
-    chemin_explore, temps_calcul = plus_proche_voisin(
-        data, matrice_distance)
-
-    # Ajout des chemins explorés
-    resolution['Chemins'].extend(chemin_explore)
-    # Le trajet finalement trouvé se trouve en dernière position
+    # Calcul de la distance du trajet final trouvé par l'algorithme. En dernière position
+    # de la variable précédente
     distance_chemin_sub_optimal = distance_trajet(
-        resolution['Chemins'][-1], matrice_distance)
-
-    # Calcul de l'erreur réalisé si le chemin optimal est renseigné
+        chemin_explores[-1], matrice_distance)
+    # Calcul de l'erreur si un chemin optimal est renseigné
     if chemin_optimal != []:
         erreur = 100*(distance_chemin_sub_optimal -
                       distance_chemin_optimal)/distance_chemin_optimal
-        resolution['Erreur (en %)'] = erreur
 
-    resolution['Nombre de villes'] = len(resolution['Chemins'][-1])
-    resolution['Temps de calcul (en s)'] = temps_calcul
-    return resolution
+    # Chemin final trouvé
+    solution = chemin_explores[-1]
+
+    # Création du dataframe à retourner
+    df_resultat_test = pd.DataFrame({
+        'Nombre de villes': len(solution),
+        # Dans un tableau pour être sur une seule ligne du dataframe
+        'Solution': [solution],
+        # Erreur par rapport à la solution optimal de la TSPLIB
+        'Erreur (en %)': erreur,
+        'Temps de calcul (en s)': temps_calcul
+    })
+
+    return df_resultat_test
