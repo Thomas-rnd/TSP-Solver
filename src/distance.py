@@ -48,7 +48,7 @@ def matrice_distance(data):
                 # sur la même ville
                 distance[i].append(0)
             else:
-                # Auttrement calcul de la distance
+                # Autrement calcul de la distance
                 x1 = data.iloc[:, i].x
                 y1 = data.iloc[:, i].y
                 x2 = data.iloc[:, j].x
