@@ -56,6 +56,49 @@ def test_global_2_opt():
     return (df_resultat_test)
 
 
+def test_unitaire_2_opt(num_dataset):
+    """Lancement d'un test de l'algorithme 2-opt
+
+    Returns
+    -------
+    Dataframe
+        variable stockant un ensemble de variables importantes pour analyser
+        l'algorithme
+    """
+    # Dataframe à retourner, une ligne représente un test de l'algorithme
+    df_resultat_test = pd.DataFrame({
+        'Nombre de villes': [],
+        'Solution': [],
+        # Erreur par rapport à la solution optimal de la TSPLIB
+        'Erreur (en %)': [],
+        'Temps de calcul (en s)': []
+    })
+
+    # Initialisation du data frame avec TSPLIB
+    data = data_TSPLIB(f'../data/{ENSEMBLE_TEST[num_dataset]}.txt')
+
+    # Initialisation de la matrice des distances relatives
+    mat_distance = matrice_distance(data)
+
+    # Initialisation du chemin optimal
+    chemin_optimal = tour_optimal(
+        f'../data/{ENSEMBLE_TEST[num_dataset]}_opt_tour.txt')
+
+    # On prend un chemin initial meilleur qu'un chemin aléatoire
+    # Attention cheminInitial est la liste des chemin exploré par l'algorithme
+    # plus_proche_voisin
+    cheminInitial, temps_calcul = plusProcheVoisin.plus_proche_voisin(
+        data, mat_distance)
+
+    # Lancement de l'algorithme 2-opt
+    df_res = algo2Opt.main(mat_distance, cheminInitial[-1], chemin_optimal)
+
+    df_resultat_test = pd.concat(
+        [df_resultat_test, df_res], ignore_index=True)
+    representation_temps_calcul(df_resultat_test)
+    return (df_resultat_test, data)
+
+
 def test_global_plus_proche_voisin():
     """Lancement des tests de l'algorithme plus proche voisin
 
