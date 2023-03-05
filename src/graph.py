@@ -49,9 +49,15 @@ def representation_itineraire_web(data):
     ----------
     data : DataFrame
         Dataframe stockant l'intégralité des informations sur un algorithme
+
+    Returns
+    -------
+    fig
+        Graphique de visualisation plolty
     """
-    fig = px.line(data, x='x', y='y')
-    fig.show()
+    fig = px.line(data, x='x', y='y',
+                  title='Chemin parcouru par le marchand', markers=True)
+    return fig
 
 
 def representation_temps_calcul(data):
@@ -62,9 +68,15 @@ def representation_temps_calcul(data):
     ----------
     data : DataFrame
         Dataframe stockant l'intégralité des informations sur un algorithme
+
+    Returns
+    -------
+    fig
+        Graphique de visualisation plolty
     """
-    fig = px.line(data, x='Nombre de villes', y='Temps de calcul (en s)')
-    fig.show()
+    fig = px.line(data, x='Nombre de villes',
+                  y='Temps de calcul (en s)', title='Représentation du temps de calcul en fonction du nombre de ville à explorer', markers=True)
+    return fig
 
 
 def affichage(df_resolution, data):
@@ -77,14 +89,22 @@ def affichage(df_resolution, data):
         l'algorithme
     data : DataFrame
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
-    """
-    df_meilleur_trajet = trajet_en_df(df_resolution.loc[0, 'Solution'], data)
-    # representation_itineraire(df_meilleur_trajet)
-    representation_itineraire_web(df_meilleur_trajet)
 
-    print("=============================================")
-    print("Nombre de ville : ", df_resolution.loc[0, "Nombre de villes"])
-    print("Pourcentage d'erreur : ", df_resolution.loc[0, "Erreur (en %)"])
-    print("Temps de calcul (en s): ",
-          df_resolution.loc[0, "Temps de calcul (en s)"])
-    print("=============================================")
+    Returns
+    -------
+    fig
+        Graphique de visualisation plolty
+    """
+    df_meilleur_trajet = trajet_en_df(
+        df_resolution.loc[0, 'Solution'], data)
+    # fig = representation_itineraire(df_meilleur_trajet)
+    fig = representation_itineraire_web(df_meilleur_trajet)
+
+    # print("=============================================")
+    # print("Nombre de ville : ", df_resolution.loc[0, "Nombre de villes"])
+    # print("Pourcentage d'erreur : ", df_resolution.loc[0, "Erreur (en %)"])
+    # print("Temps de calcul (en s): ",
+    #      df_resolution.loc[0, "Temps de calcul (en s)"])
+    # print("=============================================")
+
+    return fig
