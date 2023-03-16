@@ -1,3 +1,12 @@
-from testTSPLIB import test_global_plus_proche_voisin, test_global_2_opt, test_global_algo_genetique
+import numpy as np
+import pandas as pd
+from scipy.spatial import distance
+from test_algo import test_unitaire_plus_proche_voisin
+from graph import representation_itineraire_web, representation_itineraire_back
+from init_test_data import data_TSPLIB, trajet_en_df
 
-resultats_test_2_opt = test_global_2_opt()
+data = data_TSPLIB('../data/qa194.tsp')
+df = test_unitaire_plus_proche_voisin(1)
+print(df)
+df_solution = trajet_en_df(df['Solution'], data)
+representation_itineraire_web(df_solution).show()
