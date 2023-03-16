@@ -1,18 +1,16 @@
 import time
 
 import numpy as np
+import pandas as pd
 
 from distance import distance_trajet
-from graph import affichage
-from testData import data_TSPLIB, tour_optimal, trajet_en_df
-import pandas as pd
 
 """
 En s'inspirant de la documentation wikipedia sur le 2-opt pour résoudre le TSP, nous
 allons essayer de l'implémenter. Cet algorithme donne un résultat sub-optimal en temps
-très raisonnable. L'unique optimisation que nous réaliserons concerne la maj de la distance
-parcourue. En effet, on ne calculera uniquement la partie du trajet qui se verra modifiée
-à la suite de l'inversion. Cela concerne nous 2 arêtes du graph à parcourir.
+très raisonnable. L'unique optimisation que nous réaliserons concerne l'évaluation des 
+distances. En effet, on ne calculera uniquement la partie du trajet qui se verra modifiée
+à la suite de l'inversion, c'est-à-dire 2 arêtes.
 
 Cf. https://fr.wikipedia.org/wiki/2-opt
 """
@@ -46,8 +44,11 @@ def gain(matrice_distance, meilleur_chemin, i, j):
     fin_permutation = meilleur_chemin[j]
     apres_permuation = meilleur_chemin[j+1]
 
+    # Calcul des distances ce voyant modifiées avec l'inversion
+    # Les 2 anciennes arêtes
     distance_initiale = matrice_distance[avant_permutation][debut_permutation
                                                             ]+matrice_distance[fin_permutation][apres_permuation]
+    # Les 2 nouvelles arêtes
     distance_finale = matrice_distance[avant_permutation][fin_permutation
                                                           ]+matrice_distance[debut_permutation][apres_permuation]
     return (distance_initiale-distance_finale)
@@ -107,6 +108,7 @@ def deux_opt(itineraire_initial, matrice_distance):
 
     while amelioration:
         amelioration = False
+        # Parcours de l'ensemble des villes en réalisant l'ensemble des permutations possibles
         for debut_inversion in range(1, nombre_ville - 2):
             for fin_inversion in range(debut_inversion + 1, nombre_ville - 1):
                 if (gain(matrice_distance, chemin_explores[-1], debut_inversion, fin_inversion)) > 0:
@@ -114,7 +116,7 @@ def deux_opt(itineraire_initial, matrice_distance):
                         chemin_explores[-1], debut_inversion, fin_inversion)
                     nouvelle_distance = distance_trajet(
                         nouveau_chemin, matrice_distance)
-
+                    # On regarde si le chemin est meilleur que le chemin courant
                     if (nouvelle_distance < meilleur_distance):
                         chemin_explores.append(nouveau_chemin)
                         meilleur_distance = nouvelle_distance
@@ -125,7 +127,7 @@ def deux_opt(itineraire_initial, matrice_distance):
 
 
 def main(matrice_distance, chemin_initial, chemin_optimal=[]):
-    """Lancement de l'algorithme de recherche 
+    """Lancement de l'algorithme de recherche sur 1 jeu de données
 
     Parameters
     ----------
@@ -134,13 +136,13 @@ def main(matrice_distance, chemin_initial, chemin_optimal=[]):
     chemin_initial : list
         suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément 
         sur la solution finale trouvée.
-    chemin_optimal : list
-        résulat optimal donné par la TSPLIB
+    chemin_optimal : list (optionnel)
+        résulat optimal donné par la librairie TSPLIB
 
     Returns
     -------
     Dataframe
-        variable stockant un ensemble de variables importantes pour analyser
+        variable stockant un ensemble de données importantes pour analyser
         l'algorithme
     """
 
@@ -159,6 +161,8 @@ def main(matrice_distance, chemin_initial, chemin_optimal=[]):
     if chemin_optimal != []:
         erreur = 100*(distance_chemin_sub_optimal -
                       distance_chemin_optimal)/distance_chemin_optimal
+    else:
+        erreur = None
 
     # Chemin final trouvé
     solution = chemin_explores[-1]

@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
 
-from testData import trajet_en_df
+from init_test_data import trajet_en_df
 
 
-def representation_itineraire_back(data, reseau_neurones=[]):
+def representation_itineraire_back(data):
     """Affichage des N villes par des points ainsi que le parcours réalisé
        Le parcours est donné par l'ordre des villes dans le dataframe
 
@@ -17,27 +17,12 @@ def representation_itineraire_back(data, reseau_neurones=[]):
         list stockant un réseau de neurone de kohonen
     """
     # Affichage des points
-    plt.scatter(data.iloc[0, :], data.iloc[1, :], zorder=1)
+    plt.scatter(data.iloc[:, 1], data.iloc[:, 2], zorder=1)
     # Repérage du point initial par un cercle rouge
-    plt.scatter(data.iloc[0, 0], data.iloc[1, 0], zorder=1,
+    plt.scatter(data.iloc[0, 1], data.iloc[0, 2], zorder=1,
                 color="red", marker='o', label='Point de Départ')
     plt.legend(loc="upper right")
 
-    if (reseau_neurones == []):
-        # Affichage des traits
-        plt.plot(data.iloc[0, :], data.iloc[1, :], zorder=1)
-        plt.title('Chemin parcouru par le marchand', loc='center')
-        # Pour une visualisation plus proche de la réalité
-        # plt.axis("equal")
-    else:
-        x = [neurone[0] for neurone in reseau_neurones]
-        y = [neurone[1] for neurone in reseau_neurones]
-        # Affichage des neurones
-        plt.scatter(x, y, zorder=1,
-                    color="green", marker='x', label='Réseau de Kohonen')
-        # Affichage des traits
-        plt.plot(x, y, zorder=1)
-        plt.title('Chemin parcouru par le réseau', loc='center')
     plt.show()
 
 

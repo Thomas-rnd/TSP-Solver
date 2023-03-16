@@ -2,25 +2,27 @@ import copy
 import random
 import time
 
-import matplotlib.pyplot as plt
 import numpy
 import pandas as pd
 
-from distance import distance_trajet, matrice_distance
-from graph import affichage
-from testData import data_TSPLIB, tour_optimal, trajet_en_df
+from distance import distance_trajet
+
+"""
+En s'inspirant des cours dispensés par M. Jean-Marc Salotti en deuxième année
+à l'ENSC
+"""
 
 # Taille de la population initiale
 NOMBRE_TRAJET = 1000
 
-# Pourcentage de population conservé à chaque épisode
+# Pourcentage de population conservé à chaque epoch
 POURCENTAGE_SELECTION = 10/100
 
 # Pourcentage de mutation
-POURCENTAGE_MUTATION = 25/100
+POURCENTAGE_MUTATION = 50/100
 
 # Constante permettant d'arrêter la convergence de l'algorithme
-ERREUR_SUR_CHEMIN = 25
+NOMBRE_EPOCH = 200
 
 
 def init_population(nombre_de_trajet, data, matrice_distance):
@@ -43,12 +45,11 @@ def init_population(nombre_de_trajet, data, matrice_distance):
     list
         L'ensemble des N trajets distincts crées
     """
-    # Liste des solutions
+    # Liste des trajets initiaux
     trajets = []
     for i in range(nombre_de_trajet):
         # Initialisation de la forme d'une solution
-        # On instancie un nouveau dictionnaire à chaque foid
-        # car type référence
+        # Dans la boucle pour éviter les problèmes du type référence
         trajet = {"Villes": [], 'Distance': 0}
         # Génération d'un ordre de parcours des villes de manière aléatoire
         trajet['Villes'] = random.sample(
@@ -62,12 +63,12 @@ def init_population(nombre_de_trajet, data, matrice_distance):
 
 
 def individus_ordonnes(trajets):
-    """Tri des trajts par ordre croissant de leur distance 
+    """Tri les trajets par ordre croissant de leur distance 
 
     Parameters
     ----------
-    trajet : dict
-        ordre de parcours des villes et distance du trajet
+    trajets : list
+        liste des différents trajets
 
     Returns
     -------
@@ -85,8 +86,8 @@ def selection(trajets, pourcentage):
 
     Parameters
     ----------
-    trajet : dict
-        ordre de parcours des villes et distance du trajet
+    trajets : list
+        liste des différents trajets
     pourcentage : int
         le pourcentage à garder de la population initiale
 
@@ -121,23 +122,21 @@ def probabilite(pourcentage):
     return False
 
 
-"""
-Pour les mutations il est important de conserver l'intégrité de nos trajets. Le point initial est confondu
-avec le point final. Le choix du point initial est arbitraire, il n'éxiste pas une première ville meilleur que les autres. 
-Prenant en compte ce principe, on effectura pas de permutation affectant les extrémités du trajet.
-"""
+# Pour les mutations il est important de conserver l'intégrité de nos trajets. Le point initial est confondu
+# avec le point final. Le choix du point initial est arbitraire, il n'éxiste pas une première ville meilleur que les autres.
+# Prenant en compte ce principe, on effectura pas de permutation affectant les extrémités du trajet.
 
 
-def cadre_mutation(nbVilles):
+def cadre_mutation(nb_villes):
     """Définition des villes pouvant permuter en fonction de la remarque précédente.
 
-    Les villes qui peuvent permutter sont comprise entre la première et l'avant avant dernière
+    Les villes pouvant permutter sont comprises entre la première et l'avant avant dernière.
     On permutte avec la ville suivante donc l'avant dernière permuterait avec la dernière ce qui 
     n'est pas possible
 
     Parameters
     ----------
-    nbVilles : int
+    nb_villes : int
         nombre de ville à traverser 
 
     Returns
@@ -146,8 +145,8 @@ def cadre_mutation(nbVilles):
         index des villes qui peuvent muter
     """
     # Initialisation du cadre
-    villesMutables = [1, nbVilles-3]
-    return villesMutables
+    villes_mutables = [1, nb_villes-3]
+    return villes_mutables
 
 
 def mutation_sucessive(trajet):
@@ -178,7 +177,7 @@ def mutation_sucessive(trajet):
         # Permutation des deux éléments
         enfant['Villes'][r], enfant['Villes'][r +
                                               1] = enfant['Villes'][r+1], enfant['Villes'][r]
-    return (enfant)
+    return enfant
 
 
 def mutation_aleatoire(trajet):
@@ -209,7 +208,7 @@ def mutation_aleatoire(trajet):
         # Permutation des deux éléments
         enfant['Villes'][r[0]], enfant['Villes'][r[1]
                                                  ] = enfant['Villes'][r[1]], enfant['Villes'][r[0]]
-    return (enfant)
+    return enfant
 
 
 def generation(trajets_originels, nombre_de_trajet, pourcentage_mutation, matrice_distance):
@@ -234,6 +233,7 @@ def generation(trajets_originels, nombre_de_trajet, pourcentage_mutation, matric
     list
         L'ensemble des N trajets distincts crées
     """
+    # Tant que la population n'a pas la bonne taille
     while len(trajets_originels) < nombre_de_trajet:
         for trajet in trajets_originels:
             # Génération des altérations : mutation, croisement, ...
@@ -249,9 +249,10 @@ def generation(trajets_originels, nombre_de_trajet, pourcentage_mutation, matric
 
 
 def evaluation(trajet, matrice_distance):
-    """Fonction d'évalusation de l'algorithme
+    """Fonction d'évaluation de l'algorithme
 
-    Evaluation de la population. Plus un trajet est court plus il est considéré comme bon
+    On va venir noter chacun des trajets de la population. Plus un trajet
+    est court plus il est considéré comme bon
 
     Parameters
     ----------
@@ -271,8 +272,8 @@ def evaluation(trajet, matrice_distance):
     return maj_trajet
 
 
-def main(data, matrice_distance, chemin_optimal):
-    """Lancement de l'algorithme de recherche 
+def main(data, matrice_distance, chemin_optimal=[]):
+    """Lancement de l'algorithme de recherche sur 1 jeu de données
 
     Parameters
     ----------
@@ -280,34 +281,41 @@ def main(data, matrice_distance, chemin_optimal):
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     matrice_distance : list
         matrice stockant l'integralité des distances inter villes
-    chemin_optimal : list
-        résulat optimal donné par la TSPLIB
+    chemin_optimal : list (optionnel)
+        résulat optimal donné par la librairie TSPLIB
 
     Returns
     -------
     Dataframe
-        variable stockant un ensemble de variables importantes pour analyser
+        variable stockant un ensemble de données importantes pour analyser
         l'algorithme
     """
     # Distance chemin optimal
-    distance_chemin_optimal = distance_trajet(chemin_optimal, matrice_distance)
+    if chemin_optimal != []:
+        distance_chemin_optimal = distance_trajet(
+            chemin_optimal, matrice_distance)
 
-    # Initialisation de n individus initiaux (Génèse)
+    # Initialisation de n individus initiaux (génèse)
     trajets_initiaux = init_population(NOMBRE_TRAJET, data, matrice_distance)
 
-    # Initialisation de l'erreur initiale à 100%
-    erreur = 100
+    # Initialisation du nombre d'epoch
+    epoch = 0
 
     # Evaluation du temps de calcul
     start = time.time()
-    # On arrète l'algorithme quand une approximation du chemin optimal est atteinte
-    while erreur > ERREUR_SUR_CHEMIN:
+    # On arrete l'algorithme après un nombre d'epoch fixé. Pour permettre de visualiser
+    # un résultat même si l'algorithme ne converge pas (ou pas assez vite).
+    while epoch <= NOMBRE_EPOCH:
+        epoch += 1
         # Tri
         trajets_ordonnes = individus_ordonnes(trajets_initiaux)
 
-        # Erreur relative de ce chemin
-        erreur = 100*(trajets_ordonnes[0]['Distance'] -
-                      distance_chemin_optimal)/distance_chemin_optimal
+        # Erreur relative du meilleur chemin
+        if chemin_optimal != []:
+            erreur = 100*(trajets_ordonnes[0]['Distance'] -
+                          distance_chemin_optimal)/distance_chemin_optimal
+        else:
+            erreur = None
 
         # Sélection
         meilleurs_trajets = selection(trajets_ordonnes, POURCENTAGE_SELECTION)
@@ -316,7 +324,7 @@ def main(data, matrice_distance, chemin_optimal):
         trajets_initiaux = generation(
             meilleurs_trajets, NOMBRE_TRAJET, POURCENTAGE_MUTATION, matrice_distance)
 
-     # Chemin final trouvé
+    # Chemin final trouvé
     solution = meilleurs_trajets[0]['Villes']
     temps_calcul = time.time() - start
 
