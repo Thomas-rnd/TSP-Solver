@@ -7,10 +7,11 @@ from distance import matrice_distance
 from init_test_data import data_TSPLIB
 
 # Nom des data de test
-ENSEMBLE_TEST = ['dj38', 'qa194', 'ar9152']
+ENSEMBLE_TEST = ['dj38', 'xqf131', 'qa194', 'xqg237',
+                 'pma343', 'pka379', 'pbl395', 'pbk411', 'pbn423']
 
 
-def test_global_2_opt():
+def test_global_2_opt() -> pd.DataFrame:
     """Lancement des tests de l'algorithme 2-opt
 
     Returns
@@ -24,19 +25,19 @@ def test_global_2_opt():
         'Nombre de villes': [],
         'Solution': [],
         # Erreur par rapport à la solution optimal de la TSPLIB
-        'Erreur (en %)': [],
+        'Distance': [],
         'Temps de calcul (en s)': []
     })
     # Test sur l'ensemble des data
     for num_dataset in range(len(ENSEMBLE_TEST)):
-        df_res, data = test_unitaire_2_opt(num_dataset)
+        df_res = test_unitaire_2_opt(num_dataset)
         df_resultat_test = pd.concat(
             [df_resultat_test, df_res], ignore_index=True)
 
     return df_resultat_test
 
 
-def test_unitaire_2_opt(num_dataset):
+def test_unitaire_2_opt(num_dataset: int) -> pd.DataFrame:
     """Lancement d'un test de l'algorithme 2-opt
 
     Parameters
@@ -69,7 +70,7 @@ def test_unitaire_2_opt(num_dataset):
     return df_res
 
 
-def test_global_plus_proche_voisin():
+def test_global_plus_proche_voisin() -> pd.DataFrame:
     """Lancement des tests de l'algorithme plus proche voisin
 
     Returns
