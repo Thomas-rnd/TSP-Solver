@@ -4,7 +4,7 @@ import pandas as pd
 # http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/tsp/
 
 
-def data_TSPLIB(fichier: str) -> object:
+def data_TSPLIB(fichier: str) -> pd.DataFrame:
     """
     Lecture d'un fichier au format .tsp en copiant les informations dans 
     un dataframe pandas
@@ -45,7 +45,7 @@ def data_TSPLIB(fichier: str) -> object:
         return villes
 
 
-def trajet_en_df(trajet, data):
+def trajet_en_df(trajet: list, data: pd.DataFrame) -> pd.DataFrame:
     """Convertion d'un trajet en un dataframe
 
     Parameters
