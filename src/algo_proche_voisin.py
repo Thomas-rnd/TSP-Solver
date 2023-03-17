@@ -14,6 +14,18 @@ def plus_proche_voisin(matrice_distance: pd.DataFrame):
     """
     Retourne le chemin parcouru en parcourant les villes de proche en proche ainsi que le 
     temps de calcul
+
+    Parameters
+    ----------
+    matrice_distance : DataFrame
+        matrice stockant l'integralité des distances inter villes
+
+    Returns
+    -------
+    itineraire : list
+        suite de villes donnant le chemin parcouru
+    temps_calcul : float
+        temps de calcul pour réaliser la recherche
     """
     start_time = time.time()
 
@@ -49,6 +61,19 @@ def plus_proche_voisin(matrice_distance: pd.DataFrame):
 def main(data: pd.DataFrame, matrice_distance: pd.DataFrame):
     """
     Lancement de l'algorithme de recherche sur 1 jeu de données
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    matrice_distance : DataFrame
+        matrice stockant l'integralité des distances inter villes
+
+    Returns
+    -------
+    Dataframe
+        variable stockant un ensemble de données importantes pour analyser
+        l'algorithme
     """
 
     # On récupère le chemin final trouvé ainsi que le temps de calcul

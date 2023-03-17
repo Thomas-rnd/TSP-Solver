@@ -5,6 +5,16 @@ import pandas as pd
 def init_random_df(n: int) -> pd.DataFrame:
     """
     Initialisation d'un dataframe de ville à traverser
+
+    Parameters
+    ----------
+    n : int
+        nombre de villes présentent dans le dataframe
+
+    Returns
+    -------
+    Dataframe
+        L'ensemble de ville ainsi crée
     """
     # Borne des coordonnées x et y des villes
     TAILLE_FENETRE = 1000

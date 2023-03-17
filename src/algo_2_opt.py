@@ -5,7 +5,6 @@ import pandas as pd
 
 from distance import distance_trajet
 from init_test_data import trajet_en_df
-from graph import representation_itineraire_web
 
 """
 En s'inspirant de la documentation wikipedia sur le 2-opt pour résoudre le TSP, nous
@@ -18,7 +17,7 @@ Cf. https://fr.wikipedia.org/wiki/2-opt
 """
 
 
-def gain(matrice_distance: pd.DataFrame, meilleur_chemin: pd.DataFrame, i: int, j: int) -> bool:
+def gain(matrice_distance: pd.DataFrame, meilleur_chemin: list, i: int, j: int) -> int:
     """Gain de distance en parcourant en sens inverse une suite de ville.
 
     On vient calculer la différence de distance entre la somme des anciennes arêtes et
@@ -27,7 +26,7 @@ def gain(matrice_distance: pd.DataFrame, meilleur_chemin: pd.DataFrame, i: int, 
 
     Parameters
     ----------
-    matrice_distance : list
+    matrice_distance : Dataframe
         matrice stockant l'integralité des distances inter villes
     meilleur_chemin : list
         suite de villes donnant le chemin parcouru
@@ -56,12 +55,12 @@ def gain(matrice_distance: pd.DataFrame, meilleur_chemin: pd.DataFrame, i: int, 
     return (distance_initiale-distance_finale)
 
 
-def inversion(liste, debut_inversion, fin_inversion):
+def inversion(chemin_courant: list, debut_inversion: int, fin_inversion: int) -> list:
     """Inversion d'une partie du chemin parcouru
 
     Parameters
     ----------
-    liste : list
+    chemin_courant : list
         suite de villes donnant le chemin parcouru
     debut_inversion : int
         index de la ville où l'inversion commence
@@ -70,12 +69,12 @@ def inversion(liste, debut_inversion, fin_inversion):
 
     Returns
     -------
-    int
-        Un nouveau parcours avec l'inversion réalisé
+    list
+        Un nouveau parcours avec l'inversion réalisée
     """
-    nouvelle_liste = liste[:debut_inversion] + \
+    nouvelle_liste = chemin_courant[:debut_inversion] + \
         list(
-        reversed(liste[debut_inversion:fin_inversion+1])) + liste[fin_inversion+1:]
+        reversed(chemin_courant[debut_inversion:fin_inversion+1])) + chemin_courant[fin_inversion+1:]
     return nouvelle_liste
 
 
@@ -86,10 +85,12 @@ def deux_opt(data: pd.DataFrame, itineraire_initial: list, matrice_distance: pd.
 
     Parameters
     ----------
+    data : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     itineraire_initial : list
         suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément
         sur la solution finale trouvée.
-    matrice_distance : list
+    matrice_distance : DataFrame
         matrice stockant l'integralité des distances inter villes
 
     Returns
@@ -132,13 +133,13 @@ def main(data: pd.DataFrame, matrice_distance: pd.DataFrame, chemin_initial: lis
 
     Parameters
     ----------
-    matrice_distance : list
+    data : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    matrice_distance : DataFrame
         matrice stockant l'integralité des distances inter villes
     chemin_initial : list
         suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément
         sur la solution finale trouvée.
-    chemin_optimal : list (optionnel)
-        résulat optimal donné par la librairie TSPLIB
 
     Returns
     -------

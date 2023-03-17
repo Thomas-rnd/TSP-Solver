@@ -8,6 +8,16 @@ def data_TSPLIB(fichier: str) -> pd.DataFrame:
     """
     Lecture d'un fichier au format .tsp en copiant les informations dans 
     un dataframe pandas
+
+    Parameters
+    ----------
+    fichier : string 
+        nom du fichier à traiter
+
+    Returns
+    -------
+    DataFrame
+        L'ensemble des villes ainsi crées depuis le fichier .tsp
     """
     with open(fichier) as f:
         noeud_coord_debut = None
