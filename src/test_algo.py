@@ -52,25 +52,21 @@ def test_unitaire_2_opt(num_dataset):
         l'algorithme
     """
     # Initialisation du dataframe avec TSPLIB
-    data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.txt')
+    data = data_TSPLIB(f'../data/{ENSEMBLE_TEST[num_dataset]}.tsp')
 
     # Initialisation de la matrice des distances relatives
     mat_distance = matrice_distance(data)
 
-    # Initialisation du chemin optimal
-    chemin_optimal = tour_optimal(
-        f'data/{ENSEMBLE_TEST[num_dataset]}_opt_tour.txt')
-
     # On prend un chemin initial meilleur qu'un chemin aléatoire
     # Attention chemin_initial est la liste des chemins explorés par l'algorithme
     # plus_proche_voisin
-    chemin_initial, temps_calcul = src.algo_proche_voisin.plus_proche_voisin(
-        data, mat_distance)
+    chemin_initial, temps_calcul = algo_proche_voisin.plus_proche_voisin(
+        mat_distance)
 
     # Lancement de l'algorithme 2-opt
-    df_res = src.algo_2_opt.main(
-        mat_distance, chemin_initial[-1], chemin_optimal)
-    return df_res, data
+    df_res = algo_2_opt.main(
+        data, mat_distance, chemin_initial)
+    return df_res
 
 
 def test_global_plus_proche_voisin():
@@ -87,19 +83,19 @@ def test_global_plus_proche_voisin():
         'Nombre de villes': [],
         'Solution': [],
         # Erreur par rapport à la solution optimal de la TSPLIB
-        'Erreur (en %)': [],
+        'Distance': [],
         'Temps de calcul (en s)': []
     })
 
     for num_dataset in range(len(ENSEMBLE_TEST)):
-        df_res, data = test_unitaire_plus_proche_voisin(num_dataset)
+        df_res = test_unitaire_plus_proche_voisin(num_dataset)
         df_resultat_test = pd.concat(
             [df_resultat_test, df_res], ignore_index=True)
 
     return df_resultat_test
 
 
-def test_unitaire_plus_proche_voisin(num_dataset):
+def test_unitaire_plus_proche_voisin(num_dataset: int) -> pd.DataFrame:
     """Lancement d'un test de l'algorithme du plus proche voisin
 
     Parameters
