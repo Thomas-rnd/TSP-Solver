@@ -14,6 +14,6 @@ representation_itineraire_web(df_solution).show()
 
 data = data_TSPLIB('../data/qa194.tsp')
 df = test_unitaire_2_opt(1)
+df_solution = trajet_en_df(df['Solution'][0], data)
 print(df)
-df_solution = trajet_en_df(df['Solution'], data)
 representation_itineraire_web(df_solution).show()

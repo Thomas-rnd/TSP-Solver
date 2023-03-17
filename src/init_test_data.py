@@ -70,4 +70,4 @@ def trajet_en_df(trajet: list, data: pd.DataFrame) -> pd.DataFrame:
         index.append(i)
     # Un dataframe d'une ligne par ville
     df_res = pd.DataFrame({'Ville': index, 'x': x, 'y': y})
-    return (df_res)
+    return df_res
