@@ -26,7 +26,7 @@ def representation_itineraire_back(data):
     plt.show()
 
 
-def representation_itineraire_web(data):
+def representation_itineraire_web(data: pd.DataFrame) -> px:
     """Affichage des N villes par des points ainsi que le parcours réalisé
        Le parcours est donné par l'ordre des villes dans le dataframe
 
