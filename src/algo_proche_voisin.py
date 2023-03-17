@@ -10,7 +10,7 @@ from init_test_data import trajet_en_df
 # à l'ENSC
 
 
-def plus_proche_voisin(itineraire_initial: list, matrice_distance: pd.DataFrame) -> tuple:
+def plus_proche_voisin(matrice_distance: pd.DataFrame):
     """
     Retourne le chemin parcouru en parcourant les villes de proche en proche ainsi que le 
     temps de calcul
@@ -18,7 +18,7 @@ def plus_proche_voisin(itineraire_initial: list, matrice_distance: pd.DataFrame)
     start_time = time.time()
 
     # Initialiation du matrice booléenne d'état de visite des villes
-    visite = np.zeros(len(itineraire_initial)) != 0
+    visite = np.zeros(matrice_distance.shape[0]) != 0
 
     # Initialisation de l'itinéraire
     itineraire = [0]
@@ -27,7 +27,9 @@ def plus_proche_voisin(itineraire_initial: list, matrice_distance: pd.DataFrame)
     while False in visite:
         # A chaque itération on cherche la ville la plus proche de la ville actuelle
         # la ville actuelle étant la dernière de l'itinéraire
-        distance_a_ville = matrice_distance.iloc[itineraire[-1], :]
+
+        # Pour ne pas modifier le paramètre matrice_distance
+        distance_a_ville = matrice_distance.iloc[itineraire[-1], :].copy()
 
         for index in range(len(distance_a_ville)):
             if visite[index]:
@@ -45,22 +47,23 @@ def plus_proche_voisin(itineraire_initial: list, matrice_distance: pd.DataFrame)
 
 
 def main(data: pd.DataFrame, matrice_distance: pd.DataFrame):
-    # On récupère le chemin final trouvé ainsi que le temps de calcul
-    res = plus_proche_voisin(
-        data[['Ville']], matrice_distance)
+    """
+    Lancement de l'algorithme de recherche sur 1 jeu de données
+    """
 
-    solution = res[0]
-    temps_calcul = res[1]
+    # On récupère le chemin final trouvé ainsi que le temps de calcul
+    itineraire, temps_calcul = plus_proche_voisin(matrice_distance)
 
     # Calcul de la distance du trajet final trouvé par l'algorithme. En dernière position
     # de la variable précédente
-    distance_chemin_sub_optimal = distance_trajet(trajet_en_df(solution, data))
+    distance_chemin_sub_optimal = distance_trajet(
+        trajet_en_df(itineraire, data))
 
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
-        'Nombre de villes': len(solution),
+        'Nombre de villes': len(itineraire),
         # Dans un tableau pour être sur une seule ligne du dataframe
-        'Solution': solution,
+        'Solution': itineraire,
         # Erreur par rapport à la solution optimal de la TSPLIB
         'Distance': distance_chemin_sub_optimal,
         'Temps de calcul (en s)': temps_calcul
