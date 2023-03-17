@@ -95,7 +95,7 @@ def test_unitaire_2_opt(num_dataset):
 
     df_resultat_test = pd.concat(
         [df_resultat_test, df_res], ignore_index=True)
-    representation_temps_calcul(df_resultat_test)
+    print(df_resultat_test)
     return (df_resultat_test, data)
 
 

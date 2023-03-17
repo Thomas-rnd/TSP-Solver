@@ -1,3 +1,3 @@
-from testTSPLIB import test_global_plus_proche_voisin, test_global_2_opt, test_global_algo_genetique
+from testTSPLIB import test_global_plus_proche_voisin, test_global_2_opt, test_global_algo_genetique, test_unitaire_2_opt
 
-resultats_test_2_opt = test_global_2_opt()
+resultats_test_2_opt = test_unitaire_2_opt(3)
