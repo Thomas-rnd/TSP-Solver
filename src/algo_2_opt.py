@@ -159,7 +159,7 @@ def main(data: pd.DataFrame, matrice_distance: pd.DataFrame, chemin_initial: lis
     df_resultat_test = pd.DataFrame({
         'Nombre de villes': len(chemin_initial),
         # Dans un tableau pour être sur une seule ligne du dataframe
-        'Solution': itineraire,
+        'Solution': [itineraire],
         # Erreur par rapport à la solution optimal de la TSPLIB
         'Distance': distance_chemin_sub_optimal,
         'Temps de calcul (en s)': temps_calcul
