@@ -65,8 +65,7 @@ def test_unitaire_2_opt(num_dataset: int) -> pd.DataFrame:
         mat_distance)
 
     # Lancement de l'algorithme 2-opt
-    df_res = algo_2_opt.main(
-        data, mat_distance, chemin_initial)
+    df_res = algo_2_opt.main(mat_distance, chemin_initial)
     return df_res
 
 

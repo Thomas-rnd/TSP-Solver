@@ -4,7 +4,7 @@ import numpy as np
 
 from distance import distance_trajet
 from graph import affichage
-from init_test_data import data_TSPLIB, tour_optimal, trajet_en_df
+from init_test_data import data_TSPLIB, trajet_en_df
 import pandas as pd
 
 """
@@ -23,7 +23,7 @@ def gain(matrice_distance, meilleur_chemin, i, j):
 
     On vient calculer la différence de distance entre la somme des anciennes arêtes et
     la somme des nouvelles arêtes formées. Si cette somme est positive on vient de trouver
-    deux arêtes qui étaient sécantes avant l'inversion. 
+    deux arêtes qui étaient sécantes avant l'inversion.
 
     Parameters
     ----------
@@ -46,10 +46,10 @@ def gain(matrice_distance, meilleur_chemin, i, j):
     fin_permutation = meilleur_chemin[j]
     apres_permuation = meilleur_chemin[j+1]
 
-    distance_initiale = matrice_distance[avant_permutation][debut_permutation
-                                                            ]+matrice_distance[fin_permutation][apres_permuation]
-    distance_finale = matrice_distance[avant_permutation][fin_permutation
-                                                          ]+matrice_distance[debut_permutation][apres_permuation]
+    distance_initiale = matrice_distance[avant_permutation, debut_permutation
+                                         ]+matrice_distance[fin_permutation, apres_permuation]
+    distance_finale = matrice_distance[avant_permutation, fin_permutation
+                                       ]+matrice_distance[debut_permutation, apres_permuation]
     return (distance_initiale-distance_finale)
 
 
@@ -77,14 +77,14 @@ def inversion(liste, debut_inversion, fin_inversion):
 
 
 def deux_opt(itineraire_initial, matrice_distance):
-    """Recherche de deux arêtes sécantes. 
+    """Recherche de deux arêtes sécantes.
 
     Cette fonction implémente l'algorithme 2-opt décrit sur wikipédia.
 
     Parameters
     ----------
     itineraire_initial : list
-        suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément 
+        suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément
         sur la solution finale trouvée.
     matrice_distance : list
         matrice stockant l'integralité des distances inter villes
@@ -99,43 +99,39 @@ def deux_opt(itineraire_initial, matrice_distance):
     start_time = time.time()
 
     amelioration = True
-    chemin_explores = []
-    # Le chemin courant est le dernier de cette liste
-    chemin_explores.append(itineraire_initial)
-    meilleur_distance = distance_trajet(chemin_explores[-1], matrice_distance)
-    nombre_ville = len(chemin_explores[-1])
+    meilleur_chemin = itineraire_initial
+    meilleur_distance = distance_trajet(meilleur_chemin, matrice_distance)
+    nombre_ville = len(meilleur_chemin)
 
     while amelioration:
         amelioration = False
         for debut_inversion in range(1, nombre_ville - 2):
             for fin_inversion in range(debut_inversion + 1, nombre_ville - 1):
-                if (gain(matrice_distance, chemin_explores[-1], debut_inversion, fin_inversion)) > 0:
+                if (gain(matrice_distance, meilleur_chemin, debut_inversion, fin_inversion)) > 0:
                     nouveau_chemin = inversion(
-                        chemin_explores[-1], debut_inversion, fin_inversion)
+                        meilleur_chemin, debut_inversion, fin_inversion)
                     nouvelle_distance = distance_trajet(
                         nouveau_chemin, matrice_distance)
 
                     if (nouvelle_distance < meilleur_distance):
-                        chemin_explores.append(nouveau_chemin)
+                        meilleur_chemin = nouveau_chemin
                         meilleur_distance = nouvelle_distance
                         amelioration = True
 
     temps_calcul = time.time() - start_time
-    return chemin_explores, temps_calcul
+    return meilleur_chemin, temps_calcul
 
 
-def main(matrice_distance, chemin_initial, chemin_optimal=[]):
-    """Lancement de l'algorithme de recherche 
+def main(matrice_distance, chemin_initial):
+    """Lancement de l'algorithme de recherche
 
     Parameters
     ----------
     matrice_distance : list
         matrice stockant l'integralité des distances inter villes
     chemin_initial : list
-        suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément 
+        suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément
         sur la solution finale trouvée.
-    chemin_optimal : list
-        résulat optimal donné par la TSPLIB
 
     Returns
     -------
@@ -143,25 +139,15 @@ def main(matrice_distance, chemin_initial, chemin_optimal=[]):
         variable stockant un ensemble de variables importantes pour analyser
         l'algorithme
     """
-
-    if chemin_optimal != []:
-        distance_chemin_optimal = distance_trajet(
-            chemin_optimal, matrice_distance)
-
     # On récupère les chemins testés et le temps de résolution de l'algorithme
-    chemin_explores, temps_calcul = deux_opt(chemin_initial, matrice_distance)
+    itineraire, temps_calcul = deux_opt(chemin_initial, matrice_distance)
 
     # Calcul de la distance du trajet final trouvé par l'algorithme. En dernière position
     # de la variable précédente
     distance_chemin_sub_optimal = distance_trajet(
-        chemin_explores[-1], matrice_distance)
-    # Calcul de l'erreur si un chemin optimal est renseigné
-    if chemin_optimal != []:
-        erreur = 100*(distance_chemin_sub_optimal -
-                      distance_chemin_optimal)/distance_chemin_optimal
-
+        itineraire, matrice_distance)
     # Chemin final trouvé
-    solution = chemin_explores[-1]
+    solution = itineraire
 
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
@@ -169,7 +155,7 @@ def main(matrice_distance, chemin_initial, chemin_optimal=[]):
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [solution],
         # Erreur par rapport à la solution optimal de la TSPLIB
-        'Erreur (en %)': erreur,
+        'Distance': distance_chemin_sub_optimal,
         'Temps de calcul (en s)': temps_calcul
     })
 
