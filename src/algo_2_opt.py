@@ -3,7 +3,7 @@ import time
 import numpy as np
 
 from distance import distance_trajet
-from graph import affichage
+from affichage_resultats import affichage
 from init_test_data import data_TSPLIB, trajet_en_df
 import pandas as pd
 

@@ -2,7 +2,7 @@ import random
 import time
 
 from distance import distance_euclidienne, distance_trajet
-from graph import affichage, representation_itineraire_back
+from affichage_resultats import affichage, representation_itineraire_back
 
 # Nombre de neurones initialement dans la carte
 N = 4
