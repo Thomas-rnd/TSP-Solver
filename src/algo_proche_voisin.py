@@ -38,7 +38,7 @@ def plus_proche_voisin(matrice_distance):
         # la ville actuelle étant la dernière de l'itinéraire
 
         # Pour ne pas modifier le paramètre matrice_distance
-        distance_a_ville = matrice_distance[itineraire[-1], :]
+        distance_a_ville = np.copy(matrice_distance[itineraire[-1], :])
 
         for index in range(len(distance_a_ville)):
             if visite[index]:
