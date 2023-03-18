@@ -158,6 +158,7 @@ def main(data: pd.DataFrame, matrice_distance: pd.DataFrame, chemin_initial: lis
 
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
+        'Algorithme': "2-opt",
         'Nombre de villes': len(chemin_initial),
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [itineraire],

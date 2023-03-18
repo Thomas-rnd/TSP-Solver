@@ -86,6 +86,7 @@ def main(data: pd.DataFrame, matrice_distance: pd.DataFrame):
 
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
+        'Algorithme': "Plus proche voisin",
         'Nombre de villes': len(itineraire),
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [itineraire],
