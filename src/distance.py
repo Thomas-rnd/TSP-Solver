@@ -80,5 +80,5 @@ def distance_trajet(itineraire, matrice_distance):
     distance = 0
     for i in range(len(itineraire)-1):
         # distance entre la ville itineraire[i] et itineraire[i+1]
-        distance += matrice_distance[itineraire[i]][itineraire[i+1]]
+        distance += matrice_distance[itineraire[i], itineraire[i+1]]
     return distance
