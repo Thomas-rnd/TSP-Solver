@@ -18,10 +18,10 @@ df.to_csv('test_global_plus_proche_voisin.csv')
 data = data_TSPLIB('../data/qa194.tsp')
 df = test_unitaire_2_opt(2)
 affichage(df, data).show()
-"""
+
 df = test_global_2_opt()
 df.to_csv('test_global_2_opt.csv')
-"""
+
 data = data_TSPLIB('../data/qa194.tsp')
 df = test_unitaire_algo_genetique(1)
 affichage(df, data).show()
