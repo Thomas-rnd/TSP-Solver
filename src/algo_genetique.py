@@ -8,7 +8,7 @@ import pandas as pd
 
 from distance import distance_trajet, matrice_distance
 from graph import affichage
-from init_test_data import data_TSPLIB, tour_optimal, trajet_en_df
+from init_test_data import data_TSPLIB, trajet_en_df
 
 # Taille de la population initiale
 NOMBRE_TRAJET = 1000
@@ -21,6 +21,9 @@ POURCENTAGE_MUTATION = 25/100
 
 # Constante permettant d'arrêter la convergence de l'algorithme
 ERREUR_SUR_CHEMIN = 25
+
+# Constante permettant d'arrêter la convergence de l'algorithme
+NOMBRE_EPOCH = 200
 
 
 def init_population(nombre_de_trajet, data, matrice_distance):
@@ -52,7 +55,7 @@ def init_population(nombre_de_trajet, data, matrice_distance):
         trajet = {"Villes": [], 'Distance': 0}
         # Génération d'un ordre de parcours des villes de manière aléatoire
         trajet['Villes'] = random.sample(
-            range(0, len(data.loc['x'])), len(data.loc['x']))
+            range(0, data.shape[0]), data.shape[0])
         # Le marchand revient sur ses pas
         trajet['Villes'].append(trajet['Villes'][0])
         # Calcul de la distance total du parcours
@@ -171,13 +174,11 @@ def mutation_sucessive(trajet):
     # Je ne veux pas modifier le trajet initial. Comme c'est un type référence
     # je réalise une copie particulière pour ne pas pointer vers la même adresse mémoire
     enfant['Villes'] = copy.deepcopy(trajet['Villes'])
-    NOMBRE_PERMUTATIONS = 5
-    for i in range(NOMBRE_PERMUTATIONS):
-        # Indice de l'élément à permuter avec le suivant
-        r = random.randint(villes_mutables[0], villes_mutables[1])
-        # Permutation des deux éléments
-        enfant['Villes'][r], enfant['Villes'][r +
-                                              1] = enfant['Villes'][r+1], enfant['Villes'][r]
+    # Indice de l'élément à permuter avec le suivant
+    r = random.randint(villes_mutables[0], villes_mutables[1])
+    # Permutation des deux éléments
+    enfant['Villes'][r], enfant['Villes'][r +
+                                          1] = enfant['Villes'][r+1], enfant['Villes'][r]
     return (enfant)
 
 
@@ -202,13 +203,11 @@ def mutation_aleatoire(trajet):
     # Je ne veux pas modifier le trajet initial. Comme c'est un type référence
     # je réalise une copie particulière pour ne pas pointer vers la même adresse mémoire
     enfant['Villes'] = copy.deepcopy(trajet['Villes'])
-    NOMBRE_PERMUTATIONS = 5
-    for i in range(NOMBRE_PERMUTATIONS):
-        # Indice des éléments à permuter cette fois si ils ne sont pas forcément l'un après l'autre
-        r = random.sample(range(villes_mutables[0], villes_mutables[1]), 2)
-        # Permutation des deux éléments
-        enfant['Villes'][r[0]], enfant['Villes'][r[1]
-                                                 ] = enfant['Villes'][r[1]], enfant['Villes'][r[0]]
+    # Indice des éléments à permuter cette fois si ils ne sont pas forcément l'un après l'autre
+    r = random.sample(range(villes_mutables[0], villes_mutables[1]), 2)
+    # Permutation des deux éléments
+    enfant['Villes'][r[0]], enfant['Villes'][r[1]
+                                             ] = enfant['Villes'][r[1]], enfant['Villes'][r[0]]
     return (enfant)
 
 
@@ -271,7 +270,7 @@ def evaluation(trajet, matrice_distance):
     return maj_trajet
 
 
-def main(data, matrice_distance, chemin_optimal):
+def main(data, matrice_distance):
     """Lancement de l'algorithme de recherche 
 
     Parameters
@@ -280,8 +279,6 @@ def main(data, matrice_distance, chemin_optimal):
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     matrice_distance : list
         matrice stockant l'integralité des distances inter villes
-    chemin_optimal : list
-        résulat optimal donné par la TSPLIB
 
     Returns
     -------
@@ -289,25 +286,20 @@ def main(data, matrice_distance, chemin_optimal):
         variable stockant un ensemble de variables importantes pour analyser
         l'algorithme
     """
-    # Distance chemin optimal
-    distance_chemin_optimal = distance_trajet(chemin_optimal, matrice_distance)
-
     # Initialisation de n individus initiaux (Génèse)
     trajets_initiaux = init_population(NOMBRE_TRAJET, data, matrice_distance)
 
-    # Initialisation de l'erreur initiale à 100%
-    erreur = 100
+    # Initialisation du nombre d'epoch
+    epoch = 0
 
     # Evaluation du temps de calcul
     start = time.time()
-    # On arrète l'algorithme quand une approximation du chemin optimal est atteinte
-    while erreur > ERREUR_SUR_CHEMIN:
+    # On arrete l'algorithme après un nombre d'epoch fixé. Pour permettre de visualiser
+    # un résultat même si l'algorithme ne converge pas (ou pas assez vite).
+    while epoch <= NOMBRE_EPOCH:
+        epoch += 1
         # Tri
         trajets_ordonnes = individus_ordonnes(trajets_initiaux)
-
-        # Erreur relative de ce chemin
-        erreur = 100*(trajets_ordonnes[0]['Distance'] -
-                      distance_chemin_optimal)/distance_chemin_optimal
 
         # Sélection
         meilleurs_trajets = selection(trajets_ordonnes, POURCENTAGE_SELECTION)
@@ -316,8 +308,9 @@ def main(data, matrice_distance, chemin_optimal):
         trajets_initiaux = generation(
             meilleurs_trajets, NOMBRE_TRAJET, POURCENTAGE_MUTATION, matrice_distance)
 
-     # Chemin final trouvé
+    # Chemin final trouvé
     solution = meilleurs_trajets[0]['Villes']
+    distance = distance_trajet(solution, matrice_distance)
     temps_calcul = time.time() - start
 
     # Création du dataframe à retourner
@@ -326,7 +319,7 @@ def main(data, matrice_distance, chemin_optimal):
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [solution],
         # Erreur par rapport à la solution optimal de la TSPLIB
-        'Erreur (en %)': erreur,
+        'Distance': distance,
         'Temps de calcul (en s)': temps_calcul
     })
 
