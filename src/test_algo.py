@@ -22,6 +22,7 @@ def test_global_2_opt() -> pd.DataFrame:
     """
     # Dataframe à retourner, une ligne représente un test de l'algorithme
     df_resultat_test = pd.DataFrame({
+        'Algorithme': [],
         'Nombre de villes': [],
         'Solution': [],
         # Erreur par rapport à la solution optimal de la TSPLIB
@@ -80,6 +81,7 @@ def test_global_plus_proche_voisin() -> pd.DataFrame:
     """
     # Dataframe à retourner, une ligne représente un test de l'algorithme
     df_resultat_test = pd.DataFrame({
+        'Algorithme': [],
         'Nombre de villes': [],
         'Solution': [],
         # Erreur par rapport à la solution optimal de la TSPLIB
@@ -133,6 +135,7 @@ def test_global_algo_genetique() -> pd.DataFrame:
     """
     # Dataframe à retourner, une ligne représente un test de l'algorithme
     df_resultat_test = pd.DataFrame({
+        'Algorithme': [],
         'Nombre de villes': [],
         'Solution': [],
         # Erreur par rapport à la solution optimal de la TSPLIB
