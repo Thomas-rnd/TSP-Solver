@@ -120,10 +120,10 @@ def test_unitaire_plus_proche_voisin(num_dataset: int) -> pd.DataFrame:
     # Lancement de l'algorithme plus proche voisin
     df_res = algo_proche_voisin.main(data, mat_distance)
 
-    return (df_res)
+    return df_res
 
 
-def test_global_algo_genetique():
+def test_global_algo_genetique() -> pd.DataFrame:
     """Lancement des tests de l'algorithme génétique
 
     Returns
@@ -137,12 +137,12 @@ def test_global_algo_genetique():
         'Nombre de villes': [],
         'Solution': [],
         # Erreur par rapport à la solution optimal de la TSPLIB
-        'Erreur (en %)': [],
+        'Distance': [],
         'Temps de calcul (en s)': []
     })
 
     for num_dataset in range(len(ENSEMBLE_TEST)):
-        df_res, data = test_unitaire_algo_genetique(num_dataset)
+        df_res = test_unitaire_algo_genetique(num_dataset)
         df_resultat_test = pd.concat(
             [df_resultat_test, df_res], ignore_index=True)
 
@@ -165,16 +165,12 @@ def test_unitaire_algo_genetique(num_dataset):
         l'algorithme
     """
     # Initialisation du data frame avec TSPLIB
-    data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.txt')
+    data = data_TSPLIB(f'../data/{ENSEMBLE_TEST[num_dataset]}.tsp')
 
     # Initialisation de la matrice des distances relatives
     mat_distance = matrice_distance(data)
 
-    # Initialisation du chemin optimal
-    chemin_optimal = tour_optimal(
-        f'data/{ENSEMBLE_TEST[num_dataset]}_opt_tour.txt')
-
     # Lancement de l'algorithme génétique
-    df_res = src.algo_genetique.main(data, mat_distance, chemin_optimal)
+    df_res = algo_genetique.main(data, mat_distance)
 
-    return (df_res, data)
+    return df_res
