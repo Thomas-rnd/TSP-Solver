@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 
 def distance_euclidienne(x1, y1, x2, y2):
@@ -20,7 +20,7 @@ def distance_euclidienne(x1, y1, x2, y2):
     int
         la distance calculée
     """
-    distance = numpy.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+    distance = np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
     return distance
 
 
@@ -41,25 +41,25 @@ def matrice_distance(data):
     """
     # Initialisation de la matrice
     distance = [[]]
-    for i in range(len(data.loc['x'])):
-        for j in range(len(data.loc['x'])):
+    for i in range(data.shape[0]):
+        for j in range(data.shape[0]):
             if (i == j):
                 # En diagonale on a uniquement des 0. Pas de déplacement si on reste
                 # sur la même ville
-                distance[i].append(0)
+                distance[i].append(np.Inf)
             else:
                 # Autrement calcul de la distance
-                x1 = data.iloc[:, i].x
-                y1 = data.iloc[:, i].y
-                x2 = data.iloc[:, j].x
-                y2 = data.iloc[:, j].y
+                x1 = data.iloc[i, 1]
+                y1 = data.iloc[i, 2]
+                x2 = data.iloc[j, 1]
+                y2 = data.iloc[j, 2]
                 distance[i].append(distance_euclidienne(x1, y1, x2, y2))
         # Pour éviter d'ajouter une ligne inutilisée
-        if (i != len(data.loc['x'])-1):
+        if (i != data.shape[0]-1):
             # Une fois que tous les couples de distance sont initialisés pour une ville
             # on ajoute une ville pour faire de même avec la ville suivante
             distance.append([])
-    return distance
+    return np.array(distance)
 
 
 def distance_trajet(itineraire, matrice_distance):
