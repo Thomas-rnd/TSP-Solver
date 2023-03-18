@@ -4,7 +4,7 @@ import numpy as np
 
 from distance import distance_trajet
 from graph import affichage
-from testData import data_TSPLIB, tour_optimal, trajet_en_df
+from init_test_data import data_TSPLIB, tour_optimal, trajet_en_df
 import pandas as pd
 
 """

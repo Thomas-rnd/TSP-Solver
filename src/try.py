@@ -1,8 +1,8 @@
 from distance import distance_trajet, matrice_distance
 from graph import affichage, representation_itineraire_back
 from kohonen_fail import kohonen, main
-from randomData import init_random_df
-from testData import data_TSPLIB, tour_optimal, trajet_en_df
+from init_random_data import init_random_df
+from init_test_data import data_TSPLIB, tour_optimal, trajet_en_df
 
 # Initialisation du data frame avec TSPLIB
 # data = data_TSPLIB('../data/tsp225.txt')
