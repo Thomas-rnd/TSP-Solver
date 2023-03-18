@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
 
-from testData import trajet_en_df
+from init_test_data import trajet_en_df
 
 
 def representation_itineraire_back(data, reseau_neurones=[]):
@@ -81,7 +81,6 @@ def representation_temps_calcul(data):
 
 def affichage(df_resolution, data):
     """Affichage d'un trajet et des performances d'un algorithme
-
     Parameters
     ----------
     df_resolution : Dataframe
@@ -89,22 +88,21 @@ def affichage(df_resolution, data):
         l'algorithme
     data : DataFrame
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
-
     Returns
     -------
     fig
         Graphique de visualisation plolty
     """
     df_meilleur_trajet = trajet_en_df(
-        df_resolution.loc[0, 'Solution'], data)
+        df_resolution['Solution'][0], data)
     # fig = representation_itineraire(df_meilleur_trajet)
     fig = representation_itineraire_web(df_meilleur_trajet)
 
-    # print("=============================================")
-    # print("Nombre de ville : ", df_resolution.loc[0, "Nombre de villes"])
-    # print("Pourcentage d'erreur : ", df_resolution.loc[0, "Erreur (en %)"])
-    # print("Temps de calcul (en s): ",
-    #      df_resolution.loc[0, "Temps de calcul (en s)"])
-    # print("=============================================")
+    print("=============================================")
+    print("Nombre de ville : ", df_resolution["Nombre de villes"][0])
+    print("Distance : ", df_resolution["Distance"][0])
+    print("Temps de calcul (en s): ",
+          df_resolution["Temps de calcul (en s)"][0])
+    print("=============================================")
 
     return fig

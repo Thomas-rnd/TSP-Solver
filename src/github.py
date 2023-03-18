@@ -3,7 +3,7 @@ import time
 import math
 
 from distance import distance_euclidienne, distance_trajet
-from testData import data_TSPLIB
+from init_test_data import data_TSPLIB
 from distance import matrice_distance
 
 
