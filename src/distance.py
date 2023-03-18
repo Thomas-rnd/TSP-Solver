@@ -65,3 +65,25 @@ def distance_trajet(villes: pd.DataFrame) -> float:
     distances = distance_euclidienne(points, np.roll(points, 1, axis=0))
 
     return np.sum(distances)
+
+
+def distance_trajet_mat(villes: list, matrice_distance: pd.DataFrame) -> float:
+    """Evaluation des trajets en fonction de leur distance totale
+
+    Parameters
+    ----------
+    itineraire : Dataframe
+        Liste ordonnées des villes parcourues
+    matrice_distance : Dataframe
+        matrice stockant l'integralité des distances inter villes
+
+    Returns
+    -------
+    int
+        la distance de l'itinéraire considéré
+    """
+    distance = 0
+    for i in range(len(villes)-1):
+        # distance entre la ville villes[i] et villes[i+1]
+        distance += matrice_distance.iloc[villes[i], villes[i+1]]
+    return distance
