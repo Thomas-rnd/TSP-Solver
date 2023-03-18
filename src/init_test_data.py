@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import pandas as pd
 
 # http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/tsp/
@@ -81,28 +81,3 @@ def trajet_en_df(trajet: list, data: pd.DataFrame) -> pd.DataFrame:
     # Un dataframe d'une ligne par ville
     df_res = pd.DataFrame({'Ville': index, 'x': x, 'y': y})
     return df_res
-
-
-def tour_optimal(fichier='../data/ulysses22_opt_tour.txt'):
-    """Lecture d'un jeu de données depuis un fichier .txt
-
-    Lecture du chemin optimal
-
-    Parameters
-    ----------
-    fichier : string
-        nom du fichier à traiter
-
-    Returns
-    -------
-    list
-        liste optimale du parcours des villes
-    """
-    # Ouverture et lecture du fichier ligne par ligne
-    with open(fichier, 'r') as input:
-        data = [line.replace('\n', '') for line in input.readlines()]
-    # -1 pour rester en correspondance avec le dataframe ville de 0 à n-1
-    tour_optimal = [int(i)-1 for i in data]
-    # On revient à la ville initiale
-    tour_optimal.append(tour_optimal[0])
-    return tour_optimal
