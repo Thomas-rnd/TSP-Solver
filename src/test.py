@@ -1,25 +1,45 @@
 from test_algo import test_unitaire_plus_proche_voisin, test_unitaire_2_opt, test_global_2_opt, test_global_plus_proche_voisin, test_unitaire_algo_genetique, test_global_algo_genetique
-from affichage_resultats import affichage
+from affichage_resultats import affichage, representation_temps_calcul, representation_resultats
+from init_test_data import data_TSPLIB
+import pandas as pd
 
 """
+# Création d'un dataframe de résultat de test par algo
+
+# Algo plus proche voisin
+df_1 = test_global_plus_proche_voisin()
+df_1.to_csv('../resultats/csv/test_global_plus_proche_voisin.csv')
+
+# Algo 2-opt
+df_2 = test_global_2_opt()
+df_2.to_csv('../resultats/csv/test_global_2_opt.csv')
+
+# Algo génétique
+df_3 = test_global_algo_genetique()
+df_3.to_csv('../resultats/csv/test_global_algo_genetique.csv')
+
+# Concaténation dans un seul fichier
+df = pd.concat([df_1, df_2], ignore_index=True)
+df.to_csv('../resultats/csv/test_global_algos.csv')
+
+# Test unitaire sur un jeu de données
+
+# Algo plus proche voisin
 data = data_TSPLIB('../data/dj38.tsp')
 df = test_unitaire_plus_proche_voisin(0)
 affichage(df, data).show()
 
-df = test_global_plus_proche_voisin()
-df.to_csv('../resultats/csv/test_global_plus_proche_voisin.csv')
-
+# Algo 2-opt
 data = data_TSPLIB('../data/dj38.tsp')
 df = test_unitaire_2_opt(0)
 affichage(df, data).show()
 
-df = test_global_2_opt()
-df.to_csv('../resultats/csv/test_global_2_opt.csv')
-
+# Algo génétique
 data = data_TSPLIB('../data/dj38.tsp')
 df = test_unitaire_algo_genetique(0)
 affichage(df, data).show()
-
-df = test_global_algo_genetique()
-df.to_csv('../resultats/csv/test_global_algo_genetique.csv')
 """
+
+# Création du visuel de visualisation des distances
+representation_resultats('../resultats/csv/test_global_algos.csv').show()
+representation_temps_calcul('../resultats/csv/test_global_algos.csv').show()
