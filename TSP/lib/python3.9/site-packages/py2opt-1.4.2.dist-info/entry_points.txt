@@ -1,0 +1,3 @@
+[console_scripts]
+pdrm83 = Py2Opt.__main__:main
+
