@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import plotly.express as px
 
 from init_test_data import trajet_en_df
@@ -75,9 +76,13 @@ def representation_temps_calcul(fichier_csv):
         Graphique de visualisation plolty
     """
     data = pd.read_csv(fichier_csv)
+    data['ln(Temps de calcul (en s))']=np.log(data['Temps de calcul (en s)'])
+    #fig = px.scatter(data, x='Nombre de villes',
+    #              y='ln(Temps de calcul (en s))', color='Algorithme',
+    #              title='Représentation du temps de calcul en fonction du nombre de ville à explorer', trendline="ols")
     fig = px.line(data, x='Nombre de villes',
-                  y='Temps de calcul (en s)', color='Algorithme',
-                  title='Représentation du temps de calcul en fonction du nombre de ville à explorer', markers=True)
+                  y='ln(Temps de calcul (en s))', color='Algorithme',
+                  title='Représentation du temps de calcul en fonction du nombre de ville à explorer',markers=True)
     fig.write_image("../resultats/figures/fig_temps_calcul.svg")
     return fig
 
@@ -97,10 +102,9 @@ def representation_resultats(fichier_csv):
         Graphique de visualisation plolty
     """
     data = pd.read_csv(fichier_csv)
-    data.sort_values(by='Nombre de villes')
-
-    fig = px.scatter(data, x='Nombre de villes', y='Distance', color='Algorithme',
-                     title="Distance du chemin trouvé en fonction de l'algorithme")
+    fig = px.box(data, x="Algorithme", y="Distance",color="Algorithme",
+             title="Distance du chemin trouvé en fonction de l'algorithme"
+            )
     fig.write_image("../resultats/figures/fig_distances.svg")
     return fig
 
