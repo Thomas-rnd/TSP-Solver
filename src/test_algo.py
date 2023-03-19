@@ -5,6 +5,7 @@ import algo_genetique
 import algo_proche_voisin
 from distance import matrice_distance
 from init_test_data import data_TSPLIB
+from affichage_resultats import affichage
 
 # Nom des data de test
 ENSEMBLE_TEST = ['dj38', 'xqf131', 'qa194', 'xqg237',
@@ -67,6 +68,7 @@ def test_unitaire_2_opt(num_dataset: int) -> pd.DataFrame:
 
     # Lancement de l'algorithme 2-opt
     df_res = algo_2_opt.main(mat_distance, chemin_initial)
+    affichage(df_res, data, f'2-opt/chemin_{ENSEMBLE_TEST[num_dataset]}')
     return df_res
 
 
@@ -120,7 +122,8 @@ def test_unitaire_plus_proche_voisin(num_dataset: int) -> pd.DataFrame:
 
     # Lancement de l'algorithme plus proche voisin
     df_res = algo_proche_voisin.main(mat_distance)
-
+    affichage(df_res, data,
+              f'proche_voisin/chemin_{ENSEMBLE_TEST[num_dataset]}')
     return df_res
 
 
@@ -174,5 +177,5 @@ def test_unitaire_algo_genetique(num_dataset):
 
     # Lancement de l'algorithme génétique
     df_res = algo_genetique.main(data, mat_distance)
-
+    affichage(df_res, data, f'genetique/chemin_{ENSEMBLE_TEST[num_dataset]}')
     return df_res
