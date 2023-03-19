@@ -38,8 +38,9 @@ affichage(df, data).show()
 data = data_TSPLIB('../data/dj38.tsp')
 df = test_unitaire_algo_genetique(0)
 affichage(df, data).show()
-"""
+
 
 # Création du visuel de visualisation des distances
-representation_resultats('../resultats/csv/test_global_algos.csv').show()
-representation_temps_calcul('../resultats/csv/test_global_algos.csv').show()
+representation_resultats('../resultats/csv/test_global_algos.csv')
+representation_temps_calcul('../resultats/csv/test_global_algos.csv')
+"""
