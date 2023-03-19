@@ -30,6 +30,7 @@ def init_random_df(n):
         if a not in x and b not in y:
             x.append(a)
             y.append(b)
+    index=[a for a in range(len(x))]
     # Initialisation du dataframe
-    data = pd.DataFrame({'x': x, 'y': y})
+    data = pd.DataFrame({'Ville':index,'x': x, 'y': y})
     return (data)
