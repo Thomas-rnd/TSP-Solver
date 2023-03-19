@@ -32,6 +32,7 @@ def test_global_2_opt() -> pd.DataFrame:
     })
     # Test sur l'ensemble des data
     for num_dataset in range(len(ENSEMBLE_TEST)):
+        print(f"Etape du test : {num_dataset+1}/{len(ENSEMBLE_TEST)}")
         df_res = test_unitaire_2_opt(num_dataset)
         df_resultat_test = pd.concat(
             [df_resultat_test, df_res], ignore_index=True)
@@ -92,6 +93,7 @@ def test_global_plus_proche_voisin() -> pd.DataFrame:
     })
 
     for num_dataset in range(len(ENSEMBLE_TEST)):
+        print(f"Etape du test : {num_dataset+1}/{len(ENSEMBLE_TEST)}")
         df_res = test_unitaire_plus_proche_voisin(num_dataset)
         df_resultat_test = pd.concat(
             [df_resultat_test, df_res], ignore_index=True)
@@ -147,6 +149,7 @@ def test_global_algo_genetique() -> pd.DataFrame:
     })
 
     for num_dataset in range(len(ENSEMBLE_TEST)):
+        print(f"Etape du test : {num_dataset+1}/{len(ENSEMBLE_TEST)}")
         df_res = test_unitaire_algo_genetique(num_dataset)
         df_resultat_test = pd.concat(
             [df_resultat_test, df_res], ignore_index=True)
