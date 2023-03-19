@@ -109,7 +109,7 @@ def representation_resultats(fichier_csv):
     return fig
 
 
-def affichage(df_resolution, data, nom_fichier):
+def affichage(df_resolution, data, nom_fichier=""):
     """Affichage d'un trajet et des performances d'un algorithme
     Parameters
     ----------
@@ -127,13 +127,14 @@ def affichage(df_resolution, data, nom_fichier):
         df_resolution['Solution'][0], data)
     # fig = representation_itineraire(df_meilleur_trajet)
     fig = representation_itineraire_web(df_meilleur_trajet)
-    fig.write_image(f"../resultats/figures/{nom_fichier}.svg")
+    if (nom_fichier!=""):
+        fig.write_image(f"../resultats/figures/{nom_fichier}.svg")
 
-    print("=============================================")
-    print("Nombre de ville : ", df_resolution["Nombre de villes"][0])
-    print("Distance : ", df_resolution["Distance"][0])
-    print("Temps de calcul (en s): ",
-          df_resolution["Temps de calcul (en s)"][0])
-    print("=============================================")
+    #print("=============================================")
+    #print("Nombre de ville : ", df_resolution["Nombre de villes"][0])
+    #print("Distance : ", df_resolution["Distance"][0])
+    #print("Temps de calcul (en s): ",
+    #      df_resolution["Temps de calcul (en s)"][0])
+    #print("=============================================")
 
     return fig
