@@ -3,9 +3,9 @@ import time
 import numpy as np
 import pandas as pd
 
-from affichage_resultats import affichage
-from distance import distance_trajet
-from init_test_data import data_TSPLIB, trajet_en_df
+from src.affichage_resultats import affichage
+from src.distance import distance_trajet
+from src.init_test_data import data_TSPLIB, trajet_en_df
 
 
 # En s'inspirant de la documentation wikipedia sur le 2-opt pour résoudre le TSP, nous
@@ -77,7 +77,7 @@ def inversion(liste: list, debut_inversion: int, fin_inversion: int) -> list:
     return nouvelle_liste
 
 
-def deux_opt(itineraire_initial: list, matrice_distance: np.array) -> tuple(list, float):
+def deux_opt(itineraire_initial: list, matrice_distance: np.array):
     """Recherche de deux arêtes sécantes.
 
     Cette fonction implémente l'algorithme 2-opt décrit sur wikipédia.

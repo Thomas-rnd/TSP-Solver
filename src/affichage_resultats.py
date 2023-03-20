@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 
-from init_test_data import trajet_en_df
+from src.init_test_data import trajet_en_df
 
 
 def representation_itineraire_back(data: pd.DataFrame, reseau_neurones=[]):
@@ -86,7 +86,7 @@ def representation_temps_calcul(fichier_csv: str) -> px.line:
                   y='ln(Temps de calcul (en s))', color='Algorithme',
                   title='Représentation du temps de calcul en fonction du nombre de ville à explorer', markers=True)
     # Sauvegarde de la figure au format .png
-    fig.write_image("../resultats/figures/fig_temps_calcul.png")
+    fig.write_image("resultats/figures/fig_temps_calcul.png")
     return fig
 
 
@@ -109,7 +109,7 @@ def representation_resultats(fichier_csv: str) -> px.box:
                  title="Distance du chemin trouvé en fonction de l'algorithme"
                  )
     # Sauvegarde de la figure au format .png
-    fig.write_image("../resultats/figures/fig_distances.png")
+    fig.write_image("resultats/figures/fig_distances.png")
     return fig
 
 
@@ -134,9 +134,9 @@ def affichage(df_resolution: pd.DataFrame, data: pd.DataFrame, nom_fichier="") -
         df_resolution['Solution'][0], data)
     # fig = representation_itineraire(df_meilleur_trajet)
     fig = representation_itineraire_web(df_meilleur_trajet)
-    # Sauvegarde de la figure
+    # Sauvegarde de la figure au format .png
     if (nom_fichier != ""):
-        fig.write_image(f"../resultats/figures/{nom_fichier}.svg")
+        fig.write_image(f"resultats/figures/{nom_fichier}.png")
 
     # Affichage console de certain résultat
     # print("=============================================")

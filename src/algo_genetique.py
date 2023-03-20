@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from distance import distance_trajet
+from src.distance import distance_trajet
 
 # Taille de la population initiale
 NOMBRE_TRAJET = 100
