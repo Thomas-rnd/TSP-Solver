@@ -34,7 +34,7 @@ def data_TSPLIB(fichier: str) -> pd.DataFrame:
                 noeud_coord_debut = i
             i = i+1
 
-        # Définit le point de référence au début du fichier
+        # On définit le point de référence au début du fichier
         f.seek(0)
 
         # Read a data frame out of the file descriptor
@@ -42,7 +42,7 @@ def data_TSPLIB(fichier: str) -> pd.DataFrame:
             f,
             # On commence la lecture du fichier au bon endroit
             skiprows=noeud_coord_debut + 1,
-            # Le séparateur
+            # Définition du séparateur
             sep=' ',
             # Définition des colonnes du dataframe
             names=['Ville', 'x', 'y'],
