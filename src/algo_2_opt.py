@@ -1,24 +1,23 @@
 import time
 
 import numpy as np
-
-from distance import distance_trajet
-from affichage_resultats import affichage
-from init_test_data import data_TSPLIB, trajet_en_df
 import pandas as pd
 
-"""
-En s'inspirant de la documentation wikipedia sur le 2-opt pour résoudre le TSP, nous
-allons essayer de l'implémenter. Cet algorithme donne un résultat sub-optimal en temps
-très raisonnable. L'unique optimisation que nous réaliserons concerne la maj de la distance
-parcourue. En effet, on ne calculera uniquement la partie du trajet qui se verra modifiée
-à la suite de l'inversion. Cela concerne nous 2 arêtes du graph à parcourir.
-
-Cf. https://fr.wikipedia.org/wiki/2-opt
-"""
+from affichage_resultats import affichage
+from distance import distance_trajet
+from init_test_data import data_TSPLIB, trajet_en_df
 
 
-def gain(matrice_distance, meilleur_chemin, i, j):
+# En s'inspirant de la documentation wikipedia sur le 2-opt pour résoudre le TSP, nous
+# allons essayer de l'implémenter. Cet algorithme donne un résultat sub-optimal en temps
+# très raisonnable. L'unique optimisation que nous réaliserons concerne la maj de la distance
+# parcourue. En effet, on ne calculera uniquement la partie du trajet qui se verra modifiée
+# à la suite de l'inversion. Cela concerne nous 2 arêtes du graph à parcourir.
+
+# Cf. https://fr.wikipedia.org/wiki/2-opt
+
+
+def gain(matrice_distance: np.array, meilleur_chemin: list, i: int, j: int) -> float:
     """Gain de distance en parcourant en sens inverse une suite de ville.
 
     On vient calculer la différence de distance entre la somme des anciennes arêtes et
@@ -27,7 +26,7 @@ def gain(matrice_distance, meilleur_chemin, i, j):
 
     Parameters
     ----------
-    matrice_distance : list
+    matrice_distance : np.array
         matrice stockant l'integralité des distances inter villes
     meilleur_chemin : list
         suite de villes donnant le chemin parcouru
@@ -38,28 +37,30 @@ def gain(matrice_distance, meilleur_chemin, i, j):
 
     Returns
     -------
-    int
-        Un nombre positif si l'inversion s'avère bénéfique
+    float
+        le gain effectif de l'inversion
     """
     avant_permutation = meilleur_chemin[i-1]
     debut_permutation = meilleur_chemin[i]
     fin_permutation = meilleur_chemin[j]
     apres_permuation = meilleur_chemin[j+1]
 
+    # Distance avant inversion
     distance_initiale = matrice_distance[avant_permutation, debut_permutation
                                          ]+matrice_distance[fin_permutation, apres_permuation]
+    # Distance après inversion
     distance_finale = matrice_distance[avant_permutation, fin_permutation
                                        ]+matrice_distance[debut_permutation, apres_permuation]
     return (distance_initiale-distance_finale)
 
 
-def inversion(liste, debut_inversion, fin_inversion):
+def inversion(liste: list, debut_inversion: int, fin_inversion: int) -> list:
     """Inversion d'une partie du chemin parcouru
 
     Parameters
     ----------
     liste : list
-        suite de villes donnant le chemin parcouru
+        suite de villes donnant le chemin initialement parcouru
     debut_inversion : int
         index de la ville où l'inversion commence
     fin_inversion : int
@@ -67,7 +68,7 @@ def inversion(liste, debut_inversion, fin_inversion):
 
     Returns
     -------
-    int
+    list
         Un nouveau parcours avec l'inversion réalisé
     """
     nouvelle_liste = liste[:debut_inversion] + \
@@ -76,7 +77,7 @@ def inversion(liste, debut_inversion, fin_inversion):
     return nouvelle_liste
 
 
-def deux_opt(itineraire_initial, matrice_distance):
+def deux_opt(itineraire_initial: list, matrice_distance: np.array) -> tuple(list, float):
     """Recherche de deux arêtes sécantes.
 
     Cette fonction implémente l'algorithme 2-opt décrit sur wikipédia.
@@ -86,19 +87,20 @@ def deux_opt(itineraire_initial, matrice_distance):
     itineraire_initial : list
         suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément
         sur la solution finale trouvée.
-    matrice_distance : list
+    matrice_distance : np.array
         matrice stockant l'integralité des distances inter villes
 
     Returns
     -------
     chemin_explores : list
-        L'ensemble des chemins sub-optimal trouvés
+        l'ensemble des chemins sub-optimal trouvés
     temps_calcul : int
         temps necessaire à la résolution du problème
     """
     start_time = time.time()
 
     amelioration = True
+    # Stockage du meilleur résultat courant
     meilleur_chemin = itineraire_initial
     meilleur_distance = distance_trajet(meilleur_chemin, matrice_distance)
     nombre_ville = len(meilleur_chemin)
@@ -122,12 +124,12 @@ def deux_opt(itineraire_initial, matrice_distance):
     return meilleur_chemin, temps_calcul
 
 
-def main(matrice_distance, chemin_initial):
+def main(matrice_distance: np.array, chemin_initial: list) -> pd.DataFrame:
     """Lancement de l'algorithme de recherche
 
     Parameters
     ----------
-    matrice_distance : list
+    matrice_distance : np.array
         matrice stockant l'integralité des distances inter villes
     chemin_initial : list
         suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément
@@ -139,13 +141,11 @@ def main(matrice_distance, chemin_initial):
         variable stockant un ensemble de variables importantes pour analyser
         l'algorithme
     """
-    # On récupère les chemins testés et le temps de résolution de l'algorithme
+    # On récupère lechemin trouvé et le temps de résolution de l'algorithme
     itineraire, temps_calcul = deux_opt(chemin_initial, matrice_distance)
 
-    # Calcul de la distance du trajet final trouvé par l'algorithme. En dernière position
-    # de la variable précédente
-    distance_chemin_sub_optimal = distance_trajet(
-        itineraire, matrice_distance)
+    # Calcul de la distance du trajet final trouvé par l'algorithme
+    distance_chemin_sub_optimal = distance_trajet(itineraire, matrice_distance)
     # Chemin final trouvé
     solution = itineraire
 
