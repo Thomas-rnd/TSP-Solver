@@ -155,7 +155,7 @@ def main(matrice_distance: np.array, chemin_initial: list) -> pd.DataFrame:
         'Nombre de villes': len(chemin_initial),
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [solution],
-        # Erreur par rapport à la solution optimal de la TSPLIB
+        # Distance du trajet final
         'Distance': distance_chemin_sub_optimal,
         'Temps de calcul (en s)': temps_calcul
     })

@@ -3,15 +3,13 @@ import random
 import time
 
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 import pandas as pd
 
-from distance import distance_trajet, matrice_distance
-from affichage_resultats import affichage
-from init_test_data import data_TSPLIB, trajet_en_df
+from distance import distance_trajet
 
 # Taille de la population initiale
-NOMBRE_TRAJET = 1000
+NOMBRE_TRAJET = 100
 
 # Pourcentage de population conservé à chaque épisode
 POURCENTAGE_SELECTION = 10/100
@@ -26,7 +24,7 @@ ERREUR_SUR_CHEMIN = 25
 NOMBRE_EPOCH = 200
 
 
-def init_population(nombre_de_trajet, data, matrice_distance):
+def init_population(nombre_de_trajet: int, data: pd.DataFrame, matrice_distance: np.array) -> list[dict]:
     """Initialisation de la population initiale 
 
     Construction d'une population initiale de N solutions.
@@ -37,26 +35,26 @@ def init_population(nombre_de_trajet, data, matrice_distance):
     nombre_de_trajet : int
         taille de la population initiale
     data : DataFrame
-        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
-    matrice_distance : list
+        dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    matrice_distance : np.array
         matrice stockant l'integralité des distances inter villes
 
     Returns
     -------
-    list
-        L'ensemble des N trajets distincts crées
+    list(dict)
+        l'ensemble des N trajets distincts crées
     """
-    # Liste des solutions
+    # Liste stockant la population
     trajets = []
     for i in range(nombre_de_trajet):
-        # Initialisation de la forme d'une solution
-        # On instancie un nouveau dictionnaire à chaque foid
-        # car type référence
+        # Initialisation de la forme d'une solution. On instancie un nouveau dictionnaire
+        # à chaque fois pour éviter les problématiques du type référence
         trajet = {"Villes": [], 'Distance': 0}
         # Génération d'un ordre de parcours des villes de manière aléatoire
         trajet['Villes'] = random.sample(
             range(0, data.shape[0]), data.shape[0])
-        # Le marchand revient sur ses pas
+        # Le marchand revient sur ses pas donc ajout de la première ville à la fin
+        # de la liste
         trajet['Villes'].append(trajet['Villes'][0])
         # Calcul de la distance total du parcours
         trajet = evaluation(trajet, matrice_distance)
@@ -64,39 +62,39 @@ def init_population(nombre_de_trajet, data, matrice_distance):
     return trajets
 
 
-def individus_ordonnes(trajets):
+def individus_ordonnes(trajets: list[dict]):
     """Tri des trajts par ordre croissant de leur distance 
 
     Parameters
     ----------
-    trajet : dict
-        ordre de parcours des villes et distance du trajet
+    trajets : list[dict]
+        listes de toute la population de solutions
 
     Returns
     -------
-    list
+    list[dict]
         l'ensemble des N trajets triés
     """
     return sorted(trajets, key=lambda x: x['Distance'])
 
 
-def selection(trajets, pourcentage):
-    """Sélection des n% meilleurs
+def selection(trajets: list[dict], pourcentage: int) -> list[dict]:
+    """Sélection des n meilleurs
 
     Parmi la population totale on ne conserve qu'un petit pourcentage
-    des meilleurs
+    de la population
 
     Parameters
     ----------
-    trajet : dict
+    trajets : list[dict]
         ordre de parcours des villes et distance du trajet
     pourcentage : int
         le pourcentage à garder de la population initiale
 
     Returns
     -------
-    list
-        les n% meilleurs de la population initiale
+    list[dict]
+        les n meilleurs de la population initiale
     """
     # Nombre de trajet après sélection
     nombre_selectionne = int(len(trajets)*pourcentage)
@@ -105,7 +103,7 @@ def selection(trajets, pourcentage):
     return trajets
 
 
-def probabilite(pourcentage):
+def probabilite(pourcentage: int) -> bool:
     """Tirage aléatoire simulant une probabilité de succés
 
     Parameters
@@ -124,14 +122,10 @@ def probabilite(pourcentage):
     return False
 
 
-"""
-Pour les mutations il est important de conserver l'intégrité de nos trajets. Le point initial est confondu
-avec le point final. Le choix du point initial est arbitraire, il n'éxiste pas une première ville meilleur que les autres. 
-Prenant en compte ce principe, on effectura pas de permutation affectant les extrémités du trajet.
-"""
-
-
-def cadre_mutation(nbVilles):
+# Pour les mutations il est important de conserver l'intégrité de nos trajets. Le point initial est confondu
+# avec le point final. Le choix du point initial est arbitraire, il n'éxiste pas une première ville meilleur que les autres.
+# Prenant en compte ce principe, on n'effectura pas de permutation affectant les extrémités du trajet.
+def cadre_mutation(nombre_villes: int) -> list:
     """Définition des villes pouvant permuter en fonction de la remarque précédente.
 
     Les villes qui peuvent permutter sont comprise entre la première et l'avant avant dernière
@@ -140,7 +134,7 @@ def cadre_mutation(nbVilles):
 
     Parameters
     ----------
-    nbVilles : int
+    nombre_villes : int
         nombre de ville à traverser 
 
     Returns
@@ -149,11 +143,11 @@ def cadre_mutation(nbVilles):
         index des villes qui peuvent muter
     """
     # Initialisation du cadre
-    villesMutables = [1, nbVilles-3]
-    return villesMutables
+    villes_mutables = [1, nombre_villes-3]
+    return villes_mutables
 
 
-def mutation_sucessive(trajet):
+def mutation_sucessive(trajet: dict) -> dict:
     """Définition d'une mutation d'un individu
 
     Cette mutation est une permutation aléatoire de deux villes successives
@@ -182,7 +176,7 @@ def mutation_sucessive(trajet):
     return (enfant)
 
 
-def mutation_aleatoire(trajet):
+def mutation_aleatoire(trajet: dict) -> dict:
     """Définition d'une mutation d'un individu
 
     Cette mutation est une permutation aléatoire de deux villes
@@ -194,7 +188,7 @@ def mutation_aleatoire(trajet):
 
     Returns
     -------
-    list
+    dict
         nouvel ordre de parcours des villes après mutation
     """
     # Création d'un nouveau dictionnaire pour stocker le trajet muté
@@ -203,7 +197,7 @@ def mutation_aleatoire(trajet):
     # Je ne veux pas modifier le trajet initial. Comme c'est un type référence
     # je réalise une copie particulière pour ne pas pointer vers la même adresse mémoire
     enfant['Villes'] = copy.deepcopy(trajet['Villes'])
-    # Indice des éléments à permuter cette fois si ils ne sont pas forcément l'un après l'autre
+    # Indice des éléments à permuter cette fois ci ils ne sont pas forcément l'un après l'autre
     r = random.sample(range(villes_mutables[0], villes_mutables[1]), 2)
     # Permutation des deux éléments
     enfant['Villes'][r[0]], enfant['Villes'][r[1]
@@ -211,15 +205,15 @@ def mutation_aleatoire(trajet):
     return (enfant)
 
 
-def generation(trajets_originels, nombre_de_trajet, pourcentage_mutation, matrice_distance):
+def generation(trajets_originels: list[dict], nombre_de_trajet: int, pourcentage_mutation: int, matrice_distance: np.array) -> list[dict]:
     """Génération d'une nouvelle population de N trajets
 
     Generation de m nouveaux trajets pour compléter la population sélectionnée. Ces nouveaux
-    trajets sont des enfants de ces trajets
+    trajets sont des enfants des trajets originels
 
     Parameters
     ----------
-    trajets_originels : list
+    trajets_originels : list[dict]
         ensemble des trajets sélectionnés
     nombre_de_trajet : int
         taille de la population initiale
@@ -247,8 +241,8 @@ def generation(trajets_originels, nombre_de_trajet, pourcentage_mutation, matric
     return trajets_originels
 
 
-def evaluation(trajet, matrice_distance):
-    """Fonction d'évalusation de l'algorithme
+def evaluation(trajet: dict, matrice_distance: np.array) -> dict:
+    """Fonction d'évaluation de l'algorithme
 
     Evaluation de la population. Plus un trajet est court plus il est considéré comme bon
 
@@ -256,13 +250,13 @@ def evaluation(trajet, matrice_distance):
     ----------
     trajet : dict
         ordre de parcours des villes avec distance relative
-    matrice_distance : list
+    matrice_distance : np.array
         matrice stockant l'integralité des distances inter villes
 
     Returns
     -------
-    list
-        un trajet avec distance mise à jour
+    dict
+        un trajet avec sa distance mise à jour
     """
     maj_trajet = copy.deepcopy(trajet)
     maj_trajet['Distance'] = distance_trajet(
@@ -270,14 +264,14 @@ def evaluation(trajet, matrice_distance):
     return maj_trajet
 
 
-def main(data, matrice_distance):
+def main(data: pd.DataFrame, matrice_distance: np.array) -> pd.DataFrame:
     """Lancement de l'algorithme de recherche 
 
     Parameters
     ----------
     data : DataFrame
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
-    matrice_distance : list
+    matrice_distance : np.array
         matrice stockant l'integralité des distances inter villes
 
     Returns
@@ -319,7 +313,7 @@ def main(data, matrice_distance):
         'Nombre de villes': len(solution),
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [solution],
-        # Erreur par rapport à la solution optimal de la TSPLIB
+        # Distance du trajet final
         'Distance': distance,
         'Temps de calcul (en s)': temps_calcul
     })
