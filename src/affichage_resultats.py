@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
+import pandas as pd
 import plotly.express as px
 
 from init_test_data import trajet_en_df
 
 
-def representation_itineraire_back(data, reseau_neurones=[]):
+def representation_itineraire_back(data: pd.DataFrame, reseau_neurones=[]):
     """Affichage des N villes par des points ainsi que le parcours réalisé
        Le parcours est donné par l'ordre des villes dans le dataframe
 
@@ -42,7 +42,7 @@ def representation_itineraire_back(data, reseau_neurones=[]):
     plt.show()
 
 
-def representation_itineraire_web(data):
+def representation_itineraire_web(data: pd.DataFrame) -> px.line:
     """Affichage des N villes par des points ainsi que le parcours réalisé
        Le parcours est donné par l'ordre des villes dans le dataframe
 
@@ -53,7 +53,7 @@ def representation_itineraire_web(data):
 
     Returns
     -------
-    fig
+    Figure
         Graphique de visualisation plolty
     """
     fig = px.line(data, x='x', y='y',
@@ -61,9 +61,9 @@ def representation_itineraire_web(data):
     return fig
 
 
-def representation_temps_calcul(fichier_csv):
-    """Affichage des du temps de calcul d'un algorithme en fonction
-    du nombre de ville qu'il a traité
+def representation_temps_calcul(fichier_csv: str) -> px.line:
+    """Affichage des du temps de calcul des différents algorithmes implémentés
+    en fonction du nombre de ville évalué
 
     Parameters
     ----------
@@ -72,44 +72,48 @@ def representation_temps_calcul(fichier_csv):
 
     Returns
     -------
-    fig
+    Figure
         Graphique de visualisation plolty
     """
+    # Lecture du fichier stockant l'ensemble des résultats
     data = pd.read_csv(fichier_csv)
-    data['ln(Temps de calcul (en s))']=np.log(data['Temps de calcul (en s)'])
-    #fig = px.scatter(data, x='Nombre de villes',
+    # Passange en échelle logarithmique
+    data['ln(Temps de calcul (en s))'] = np.log(data['Temps de calcul (en s)'])
+    # fig = px.scatter(data, x='Nombre de villes',
     #              y='ln(Temps de calcul (en s))', color='Algorithme',
     #              title='Représentation du temps de calcul en fonction du nombre de ville à explorer', trendline="ols")
     fig = px.line(data, x='Nombre de villes',
                   y='ln(Temps de calcul (en s))', color='Algorithme',
-                  title='Représentation du temps de calcul en fonction du nombre de ville à explorer',markers=True)
-    fig.write_image("../resultats/figures/fig_temps_calcul.svg")
+                  title='Représentation du temps de calcul en fonction du nombre de ville à explorer', markers=True)
+    # Sauvegarde de la figure au format .png
+    fig.write_image("../resultats/figures/fig_temps_calcul.png")
     return fig
 
 
-def representation_resultats(fichier_csv):
-    """Affichage des N villes par des points ainsi que le parcours réalisé
-       Le parcours est donné par l'ordre des villes dans le dataframe
+def representation_resultats(fichier_csv: str) -> px.box:
+    """Affichage des distances des chemins trouvés par algorithme
 
     Parameters
     ----------
-    data : DataFrame
-        Dataframe stockant l'intégralité des informations sur un algorithme
+    fichier_csv : str
+        fichier csv stockant l'intégralité des résultats des différents algorithmes
 
     Returns
     -------
-    fig
+    Figure
         Graphique de visualisation plolty
     """
+    # Lecture du fichier stockant l'ensemble des résultats
     data = pd.read_csv(fichier_csv)
-    fig = px.box(data, x="Algorithme", y="Distance",color="Algorithme",
-             title="Distance du chemin trouvé en fonction de l'algorithme"
-            )
-    fig.write_image("../resultats/figures/fig_distances.svg")
+    fig = px.box(data, x="Algorithme", y="Distance", color="Algorithme",
+                 title="Distance du chemin trouvé en fonction de l'algorithme"
+                 )
+    # Sauvegarde de la figure au format .png
+    fig.write_image("../resultats/figures/fig_distances.png")
     return fig
 
 
-def affichage(df_resolution, data, nom_fichier=""):
+def affichage(df_resolution: pd.DataFrame, data: pd.DataFrame, nom_fichier="") -> px.line:
     """Affichage d'un trajet et des performances d'un algorithme
     Parameters
     ----------
@@ -118,23 +122,28 @@ def affichage(df_resolution, data, nom_fichier=""):
         l'algorithme
     data : DataFrame
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    nom_fichier : str (optionnel)
+        Nom du fichier si on souhaite sauvegarder la figure crée
     Returns
     -------
-    fig
+    Figure
         Graphique de visualisation plolty
     """
+    # Création d'un dataframe complet issu de la solution trouvée
     df_meilleur_trajet = trajet_en_df(
         df_resolution['Solution'][0], data)
     # fig = representation_itineraire(df_meilleur_trajet)
     fig = representation_itineraire_web(df_meilleur_trajet)
-    if (nom_fichier!=""):
+    # Sauvegarde de la figure
+    if (nom_fichier != ""):
         fig.write_image(f"../resultats/figures/{nom_fichier}.svg")
 
-    #print("=============================================")
-    #print("Nombre de ville : ", df_resolution["Nombre de villes"][0])
-    #print("Distance : ", df_resolution["Distance"][0])
-    #print("Temps de calcul (en s): ",
+    # Affichage console de certain résultat
+    # print("=============================================")
+    # print("Nombre de ville : ", df_resolution["Nombre de villes"][0])
+    # print("Distance : ", df_resolution["Distance"][0])
+    # print("Temps de calcul (en s): ",
     #      df_resolution["Temps de calcul (en s)"][0])
-    #print("=============================================")
+    # print("=============================================")
 
     return fig
