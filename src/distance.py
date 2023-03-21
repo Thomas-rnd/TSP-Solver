@@ -24,7 +24,7 @@ def distance_euclidienne(a: np.float_, b: np.float_) -> np.float_:
 
 def matrice_distance(villes: pd.DataFrame) -> np.array:
     """
-    Retourne un dataframe stockant les distances inter villes. C'est un dataframe qui renseigne
+    Retourne une matrice stockant les distances inter villes. Cette matrice renseigne
     sur la distance entre la ville X et la ville Y à la position (X,Y).
 
     Parameters
