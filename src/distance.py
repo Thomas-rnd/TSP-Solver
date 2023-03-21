@@ -1,65 +1,48 @@
 import numpy as np
 import pandas as pd
+from scipy.spatial import distance
 
 
-def distance_euclidienne(x1: float, y1: float, x2: float, y2: float) -> float:
-    """Evaluation de la distance euclidienne entre 2 points en 2D
+def distance_euclidienne(a: np.float_, b: np.float_) -> np.float_:
+    """
+    Retourne un np.array des distances entre 2 np.array de points.
 
     Parameters
     ----------
-    x1 : int
-        coordonné x du point 1
-    x2 : int
-        coordonné x du point 2
-    y1 : int
-        coordonné y du point 1
-    y2 : int
-        coordonné y du point 2
+    a : np.float_
+        vecteur de point 2D
+    b : np.float_
+        vecteur de point 2D
 
     Returns
-    ----------
-    int
-        la distance calculée
+    -------
+    np.float_
+        vecteur des distances
     """
-    distance = np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-    return distance
+    return np.linalg.norm(a - b, axis=1)
 
 
-def matrice_distance(data: pd.DataFrame) -> np.array:
-    """Matrice des distances inter villes. C'est une matrice 2D qui renseigne
-    sur la distance entre la ville X et la ville Y à la position (X,Y) de la 
-    matrice
+def matrice_distance(villes: pd.DataFrame) -> np.array:
+    """
+    Retourne un dataframe stockant les distances inter villes. C'est un dataframe qui renseigne
+    sur la distance entre la ville X et la ville Y à la position (X,Y).
 
     Parameters
     ----------
-    data : DataFrame
+    villes : DataFrame
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
 
     Returns
     -------
-    np.array
-        la matrice ainsi calculée
+    Dataframe
+        matrice stockant l'integralité des distances inter villes
     """
-    # Initialisation de la matrice
-    distance = [[]]
-    for i in range(data.shape[0]):
-        for j in range(data.shape[0]):
-            if (i == j):
-                # Pas de déplacement si on reste sur la même ville
-                distance[i].append(np.Inf)
-            else:
-                # Autrement calcul de la distance
-                x1 = data.iloc[i, 1]
-                y1 = data.iloc[i, 2]
-                x2 = data.iloc[j, 1]
-                y2 = data.iloc[j, 2]
-                distance[i].append(distance_euclidienne(x1, y1, x2, y2))
-        # Pour éviter d'ajouter une ligne inutilisée
-        if (i != data.shape[0]-1):
-            # Une fois que tous les couples de distance sont initialisés pour une ville
-            # on ajoute une ville pour faire de même avec la ville suivante
-            distance.append([])
-    return np.array(distance)
+    dist_matrice = distance.cdist(
+        villes[['x', 'y']], villes[['x', 'y']], 'euclidean')
+
+    # On remplace les zéros des diagonales
+    dist_matrice = np.where(dist_matrice == 0, np.Inf, dist_matrice)
+    return dist_matrice
 
 
 def distance_trajet(itineraire: list, matrice_distance: np.array) -> float:
