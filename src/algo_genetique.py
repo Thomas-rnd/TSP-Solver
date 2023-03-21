@@ -15,13 +15,13 @@ NOMBRE_TRAJET = 100
 POURCENTAGE_SELECTION = 10/100
 
 # Pourcentage de mutation
-POURCENTAGE_MUTATION = 25/100
+POURCENTAGE_MUTATION = 50/100
 
 # Constante permettant d'arrêter la convergence de l'algorithme
 ERREUR_SUR_CHEMIN = 25
 
 # Constante permettant d'arrêter la convergence de l'algorithme
-NOMBRE_EPOCH = 200
+NOMBRE_EPOCH = 100
 
 
 def init_population(nombre_de_trajet: int, data: pd.DataFrame, matrice_distance: np.array) -> list[dict]:
@@ -147,35 +147,6 @@ def cadre_mutation(nombre_villes: int) -> list:
     return villes_mutables
 
 
-def mutation_sucessive(trajet: dict) -> dict:
-    """Définition d'une mutation d'un individu
-
-    Cette mutation est une permutation aléatoire de deux villes successives
-
-    Parameters
-    ----------
-    trajet : dict
-        ordre de parcours des villes et distance du trajet
-
-    Returns
-    -------
-    list
-        nouvel ordre de parcours des villes après mutation
-    """
-    # Création d'un nouveau dictionnaire pour stocker le trajet muté
-    enfant = {'Villes': [], 'Distance': 0}
-    villes_mutables = cadre_mutation(len(trajet['Villes']))
-    # Je ne veux pas modifier le trajet initial. Comme c'est un type référence
-    # je réalise une copie particulière pour ne pas pointer vers la même adresse mémoire
-    enfant['Villes'] = copy.deepcopy(trajet['Villes'])
-    # Indice de l'élément à permuter avec le suivant
-    r = random.randint(villes_mutables[0], villes_mutables[1])
-    # Permutation des deux éléments
-    enfant['Villes'][r], enfant['Villes'][r +
-                                          1] = enfant['Villes'][r+1], enfant['Villes'][r]
-    return (enfant)
-
-
 def mutation_aleatoire(trajet: dict) -> dict:
     """Définition d'une mutation d'un individu
 
@@ -231,10 +202,6 @@ def generation(trajets_originels: list[dict], nombre_de_trajet: int, pourcentage
         for trajet in trajets_originels:
             # Génération des altérations : mutation, croisement, ...
             if probabilite(pourcentage_mutation):
-                trajet = mutation_sucessive(trajet)
-                trajet = evaluation(trajet, matrice_distance)
-                trajets_originels.append(trajet)
-            elif probabilite(pourcentage_mutation):
                 trajet = mutation_aleatoire(trajet)
                 trajet = evaluation(trajet, matrice_distance)
                 trajets_originels.append(trajet)
