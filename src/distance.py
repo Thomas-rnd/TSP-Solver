@@ -65,3 +65,21 @@ def distance_trajet(itineraire: list, matrice_distance: np.array) -> float:
         # distance entre la ville itineraire[index] et itineraire[index+1]
         distance += matrice_distance[ville, itineraire[index+1]]
     return distance
+
+
+def neurone_gagnant(neurones, ville):
+    """On cherche le neurone le plus proche d'une ville donnée
+
+    Parameters
+    ----------
+    neurones : np.array
+        liste du réseau de neuronnes
+    ville : np.array
+        coordonnées 2D d'une ville donnée
+
+    Returns
+    -------
+    int
+        l'index du neurone gagnant
+    """
+    return distance_euclidienne(neurones, ville).argmin()
