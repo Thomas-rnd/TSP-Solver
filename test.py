@@ -1,4 +1,4 @@
-from src.test_algo import test_unitaire_plus_proche_voisin, test_unitaire_2_opt, test_global_2_opt, test_global_plus_proche_voisin, test_unitaire_algo_genetique, test_global_algo_genetique
+from src.test_algo import test_unitaire_plus_proche_voisin, test_unitaire_2_opt, test_global_2_opt, test_global_plus_proche_voisin, test_unitaire_algo_genetique, test_unitaire_algo_kohonen, test_global_algo_genetique
 from src.affichage_resultats import affichage, representation_temps_calcul, representation_resultats
 from src.init_test_data import data_TSPLIB
 import pandas as pd
@@ -9,11 +9,11 @@ import pandas as pd
 # Algo plus proche voisin
 df_1 = test_global_plus_proche_voisin()
 df_1.to_csv('../resultats/csv/test_global_plus_proche_voisin.csv')
-"""
+
 # Algo 2-opt
 df_2 = test_global_2_opt()
 df_2.to_csv('../resultats/csv/test_global_2_opt.csv')
-"""
+
 # Algo génétique
 df_3 = test_global_algo_genetique()
 df_3.to_csv('../resultats/csv/test_global_algo_genetique.csv')
@@ -41,6 +41,11 @@ affichage(df, data).show()
 
 
 # Création du visuel de visualisation des distances
-representation_resultats('../resultats/csv/test_global_algos.csv')
-representation_temps_calcul('../resultats/csv/test_global_algos.csv')
+representation_resultats('resultats/csv/test_global_algos.csv')
+representation_temps_calcul('resultats/csv/test_global_algos.csv')
 """
+
+data = data_TSPLIB('data/dj38.tsp')
+df = test_unitaire_algo_kohonen(0)
+print(df)
+affichage(df, data).show()
