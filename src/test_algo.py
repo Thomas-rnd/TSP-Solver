@@ -3,6 +3,7 @@ import pandas as pd
 import src.algo_2_opt
 import src.algo_genetique
 import src.algo_proche_voisin
+import src.algo_kohonen
 from src.distance import matrice_distance
 from src.init_test_data import data_TSPLIB
 from src.affichage_resultats import affichage
@@ -186,4 +187,88 @@ def test_unitaire_algo_genetique(num_dataset):
     df_res = src.algo_genetique.main(data, mat_distance)
     # Affichage du chemin trouvé et sauvegarde de la figure
     affichage(df_res, data, f'genetique/chemin_{ENSEMBLE_TEST[num_dataset]}')
+    return df_res
+
+
+def test_unitaire_algo_genetique(num_dataset):
+    """Lancement d'un test de l'algorithme génétique
+
+    Parameters
+    ----------
+    num_dataset : int
+        Numéro de dataset sur lequel est réalisé le test. Ce numéro est égale à son 
+        index dans ENSEMBLE_TEST
+
+    Returns
+    -------
+    Dataframe
+        variable stockant un ensemble de variables importantes pour analyser
+        l'algorithme
+    """
+    # Initialisation du data frame avec TSPLIB
+    data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.tsp')
+
+    # Initialisation de la matrice des distances relatives
+    mat_distance = matrice_distance(data)
+
+    # Lancement de l'algorithme génétique
+    df_res = src.algo_genetique.main(data, mat_distance)
+    # Affichage du chemin trouvé et sauvegarde de la figure
+    affichage(df_res, data, f'genetique/chemin_{ENSEMBLE_TEST[num_dataset]}')
+    return df_res
+
+
+def test_global_algo_kohonen() -> pd.DataFrame:
+    """Lancement des tests de l'algorithme de kohonen
+
+    Returns
+    -------
+    Dataframe 
+        variable stockant un ensemble de données importantes pour analyser
+        l'algorithme. Un ligne représente un test sur un jeu de données
+    """
+    # Dataframe à retourner, une ligne représente un test de l'algorithme sur un jeu de données
+    df_resultat_test = pd.DataFrame({
+        'Algorithme': [],
+        'Nombre de villes': [],
+        'Solution': [],
+        # Distance du trajet final
+        'Distance': [],
+        'Temps de calcul (en s)': []
+    })
+
+    for num_dataset in range(len(ENSEMBLE_TEST)):
+        print(f"Etape du test : {num_dataset+1}/{len(ENSEMBLE_TEST)}")
+        df_res = test_unitaire_algo_kohonen(num_dataset)
+        df_resultat_test = pd.concat(
+            [df_resultat_test, df_res], ignore_index=True)
+
+    return df_resultat_test
+
+
+def test_unitaire_algo_kohonen(num_dataset):
+    """Lancement d'un test de l'algorithme génétique
+
+    Parameters
+    ----------
+    num_dataset : int
+        Numéro de dataset sur lequel est réalisé le test. Ce numéro est égale à son 
+        index dans ENSEMBLE_TEST
+
+    Returns
+    -------
+    Dataframe
+        variable stockant un ensemble de variables importantes pour analyser
+        l'algorithme
+    """
+    # Initialisation du data frame avec TSPLIB
+    data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.tsp')
+
+    # Initialisation de la matrice des distances relatives
+    mat_distance = matrice_distance(data)
+
+    # Lancement de l'algorithme génétique
+    df_res = src.algo_kohonen.main(data, mat_distance)
+    # Affichage du chemin trouvé et sauvegarde de la figure
+    affichage(df_res, data, f'kohonen/chemin_{ENSEMBLE_TEST[num_dataset]}')
     return df_res
