@@ -61,7 +61,7 @@ def distance_trajet(itineraire: list, matrice_distance: np.array) -> float:
         la distance de l'itinéraire considéré
     """
     distance = 0
-    for i in range(len(itineraire)-1):
-        # distance entre la ville itineraire[i] et itineraire[i+1]
-        distance += matrice_distance[itineraire[i], itineraire[i+1]]
+    for index, ville in enumerate(itineraire[:-1]):
+        # distance entre la ville itineraire[index] et itineraire[index+1]
+        distance += matrice_distance[ville, itineraire[index+1]]
     return distance
