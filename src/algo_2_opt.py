@@ -71,9 +71,9 @@ def inversion(liste: list, debut_inversion: int, fin_inversion: int) -> list:
     list
         Un nouveau parcours avec l'inversion réalisé
     """
+    liste_a_inverser = liste[debut_inversion:fin_inversion+1]
     nouvelle_liste = liste[:debut_inversion] + \
-        list(
-        reversed(liste[debut_inversion:fin_inversion+1])) + liste[fin_inversion+1:]
+        liste_a_inverser[::-1] + liste[fin_inversion+1:]
     return nouvelle_liste
 
 
