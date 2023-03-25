@@ -3,6 +3,7 @@ import matplotlib as mpl
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 from src.init_test_data import trajet_en_df
 
@@ -43,58 +44,6 @@ def representation_itineraire_back(data: pd.DataFrame, reseau_neurones=[]):
     plt.show()
 
 
-def plot_network(cities, neurons, name='diagram.png', ax=None):
-    """Plot a graphical representation of the problem"""
-    mpl.rcParams['agg.path.chunksize'] = 10000
-
-    if not ax:
-        fig = plt.figure(figsize=(5, 5), frameon=False)
-        axis = fig.add_axes([0, 0, 1, 1])
-
-        axis.set_aspect('equal', adjustable='datalim')
-        plt.axis('off')
-
-        axis.scatter(cities['x'], cities['y'], color='red', s=4)
-        axis.plot(neurons[:, 0], neurons[:, 1], 'r.',
-                  ls='-', color='#0063ba', markersize=2)
-
-        plt.savefig(name, bbox_inches='tight', pad_inches=0, dpi=200)
-        plt.close()
-
-    else:
-        ax.scatter(cities['x'], cities['y'], color='red', s=4)
-        ax.plot(neurons[:, 0], neurons[:, 1], 'r.',
-                ls='-', color='#0063ba', markersize=2)
-        return ax
-
-
-def plot_route(cities, route, name='diagram.png', ax=None):
-    """Plot a graphical representation of the route obtained"""
-    mpl.rcParams['agg.path.chunksize'] = 10000
-
-    if not ax:
-        fig = plt.figure(figsize=(5, 5), frameon=False)
-        axis = fig.add_axes([0, 0, 1, 1])
-
-        axis.set_aspect('equal', adjustable='datalim')
-        plt.axis('off')
-
-        axis.scatter(cities['x'], cities['y'], color='red', s=4)
-        route = cities.reindex(route)
-        route.loc[route.shape[0]] = route.iloc[0]
-        axis.plot(route['x'], route['y'], color='purple', linewidth=1)
-
-        plt.savefig(name, bbox_inches='tight', pad_inches=0, dpi=200)
-        plt.close()
-
-    else:
-        ax.scatter(cities['x'], cities['y'], color='red', s=4)
-        route = cities.reindex(route)
-        route.loc[route.shape[0]] = route.iloc[0]
-        ax.plot(route['x'], route['y'], color='purple', linewidth=1)
-        return ax
-
-
 def representation_itineraire_web(data: pd.DataFrame) -> px.line:
     """Affichage des N villes par des points ainsi que le parcours réalisé
        Le parcours est donné par l'ordre des villes dans le dataframe
@@ -102,15 +51,55 @@ def representation_itineraire_web(data: pd.DataFrame) -> px.line:
     Parameters
     ----------
     data : DataFrame
-        Dataframe stockant l'intégralité des informations sur un algorithme
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
 
     Returns
     -------
     Figure
         Graphique de visualisation plolty
     """
-    fig = px.line(data, x='x', y='y',
-                  title='Chemin parcouru par le marchand', markers=True)
+    fig = px.scatter(data, x='x', y='y', template="simple_white",
+                     title="Shortest path find by the algorithm")
+    fig.add_trace(
+        go.Scatter(
+            x=data['x'].values,
+            y=data['y'].values,
+            mode='lines',
+            showlegend=False)
+
+    )
+    fig.update_xaxes(zeroline=False, visible=False)
+    fig.update_yaxes(zeroline=False, visible=False)
+    return fig
+
+
+def representation_reseau(data: pd.DataFrame, neurones: np.array) -> px.line:
+    """Affichage des N villes par des points ainsi que la projection du réseaux
+    de neurones sur l'espace des villes
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    reseau_neurones : list
+        list stockant un réseau de neurone de kohonen
+
+    Returns
+    -------
+    Figure
+        Graphique de visualisation plolty
+    """
+    fig = px.scatter(data, x='x', y='y', template="simple_white",
+                     title="Organisation of the Kohonen neurons network")
+    fig.add_trace(
+        go.Scatter(
+            x=[neurone[0] for neurone in neurones],
+            y=[neurone[1] for neurone in neurones],
+            mode='lines+markers',
+            showlegend=False)
+    )
+    fig.update_xaxes(zeroline=False, visible=False)
+    fig.update_yaxes(zeroline=False, visible=False)
     return fig
 
 
@@ -130,14 +119,12 @@ def representation_temps_calcul(fichier_csv: str) -> px.line:
     """
     # Lecture du fichier stockant l'ensemble des résultats
     data = pd.read_csv(fichier_csv)
-    # Passange en échelle logarithmique
-    data['ln(Temps de calcul (en s))'] = np.log(data['Temps de calcul (en s)'])
     # fig = px.scatter(data, x='Nombre de villes',
     #              y='ln(Temps de calcul (en s))', color='Algorithme',
     #              title='Représentation du temps de calcul en fonction du nombre de ville à explorer', trendline="ols")
     fig = px.line(data, x='Nombre de villes',
-                  y='ln(Temps de calcul (en s))', color='Algorithme',
-                  title='Représentation du temps de calcul en fonction du nombre de ville à explorer', markers=True)
+                  y='Temps de calcul (en s)', color='Algorithme',
+                  title='Représentation du temps de calcul en fonction du nombre de ville à explorer', markers=True, log_y=True)
     # Sauvegarde de la figure au format .png
     fig.write_image("resultats/figures/fig_temps_calcul.png")
     return fig
