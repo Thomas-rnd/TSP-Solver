@@ -3,7 +3,7 @@ import time
 import numpy as np
 import pandas as pd
 
-from src.affichage_resultats import plot_network, plot_route
+from src.affichage_resultats import representation_itineraire_web, representation_reseau
 from src.distance import distance_euclidienne, distance_trajet, neurone_gagnant
 from src.init_test_data import data_TSPLIB, normalisation
 
@@ -20,7 +20,7 @@ def creation_reseau(taille: int) -> np.array:
     Returns
     -------
     np.array
-        un ensemble de taille neuronnes de dimension 2 dans l'intervalle [0,1)
+        un ensemble de taille neurones de dimension 2 dans l'intervalle [0,1)
     """
     return np.random.rand(taille, 2)
 
@@ -57,7 +57,7 @@ def voisinage(index_neuronne_gagnant: int, rayon: int, nombre_neurones: int) -> 
     return np.exp(-(distances*distances) / (2*(rayon*rayon)))
 
 
-def chemin_final(villes: pd.DataFrame, neurones: np.array) -> pd.DataFrame:
+def chemin_final(villes: pd.DataFrame, neurones: np.array) -> list:
     """Recherche du chemin final trouvé par le réseau. 
 
     Pour cela on atitre à chacune des villes son neurone gagnant et ensuite
@@ -80,8 +80,10 @@ def chemin_final(villes: pd.DataFrame, neurones: np.array) -> pd.DataFrame:
         lambda c: neurone_gagnant(neurones, c),
         # 1 or 'columns': on applique la fonction à chaque ligne.
         axis=1, raw=True)
-
-    return villes.sort_values('ordre').index
+    # Retourne un array représentant les données de l'index
+    route = villes.sort_values('ordre').index.values
+    # On fait attention à fermer le cycle
+    return list(np.append(route, route[0]))
 
 
 def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
@@ -111,7 +113,6 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
     # La taille de la population de neuronne est 8 fois celle du nombre de villes
     # Hyperparamètre
     n = villes.shape[0]*8
-
     # Génération du réseau de neurones
     neurones = creation_reseau(n)
     # print('Réseau de {} neurones créé. On commence les itérations :'.format(n))
@@ -120,19 +121,23 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
         if not i % 100:
             # Affichage d'un feeback de l'avancement (avec retour à la ligne)
             # print('\t> Iteration {}/{}'.format(i, iterations), end="\r")
+
+            # Représentation de l'état du réseau
+            # representation_reseau(villes, neurones)
             continue
 
         # On choisit une ville aléatoire. On retourne les valeurs de x et y
         ville = villes.sample(1)[['x', 'y']].values
         index_gagnant = neurone_gagnant(neurones, ville)
-        # Generate a filter that applies changes to the winner's gaussian
+        # Génération d'un filtre gaussien modélisant l'attraction entre un neurone et ses voisins
         gaussian = voisinage(index_gagnant, n//10, neurones.shape[0])
         # Mise à jour des poids des neurones (proche de la ville initiale)
+        # np.newaxis pour contrôler le broadcasting
         neurones += gaussian[:, np.newaxis] * \
             taux_apprentissage * (ville - neurones)
         # Mise à jour du taux d'apprentissage
         taux_apprentissage = taux_apprentissage * 0.99997
-        # Réduction de la taille de la population de neurones
+        # Réduction de la distance d'influence d'un neurone
         n = n * 0.9997
 
         # Si un des paramètres a trop diminué
@@ -145,10 +150,8 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
             #      "à l'itération {}".format(i))
             break
 
-    plot_network(villes, neurones, name='diagrams/final.png')
-
     itineraire = chemin_final(villes, neurones)
-    plot_route(villes, itineraire, 'diagrams/route.png')
+    villes = villes.reindex(itineraire)
     temps_calcul = time.time() - start_time
 
     return itineraire, temps_calcul
