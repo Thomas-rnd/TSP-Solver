@@ -12,9 +12,17 @@ from src.affichage_resultats import affichage
 ENSEMBLE_TEST = ['dj38', 'xqf131', 'qa194', 'xqg237',
                  'pma343', 'pka379', 'pbl395', 'pbk411', 'pbn423']
 
+# Nom des algo implémentés
+ENSEMBLE_ALGOS = ['2_opt', 'plus_proche_voisin', 'genetique', 'kohonen']
 
-def test_global_2_opt() -> pd.DataFrame:
+
+def test_global(algo: str) -> pd.DataFrame:
     """Lancement des tests de l'algorithme 2-opt
+
+    Parameters
+    ----------
+    algo : str
+        le nom de l'algorithme à utiliser
 
     Returns
     -------
@@ -22,6 +30,11 @@ def test_global_2_opt() -> pd.DataFrame:
         variable stockant un ensemble de données importantes pour analyser
         l'algorithme. Un ligne représente un test sur un jeu de données
     """
+    if algo not in ENSEMBLE_ALGOS:
+        print(
+            "Veuillez choisir un algorithme parmi : {}".format(ENSEMBLE_ALGOS))
+        return -1
+
     # Dataframe à retourner, une ligne représente un test de l'algorithme
     df_resultat_test = pd.DataFrame({
         'Algorithme': [],
@@ -35,21 +48,30 @@ def test_global_2_opt() -> pd.DataFrame:
     for num_dataset in range(len(ENSEMBLE_TEST)):
         # Feeback d'avancement
         print(f"Etape du test : {num_dataset+1}/{len(ENSEMBLE_TEST)}")
-        df_res = test_unitaire_2_opt(num_dataset)
+        if algo == '2_opt':
+            df_res = test_unitaire(num_dataset, algo)
+        elif algo == 'plus_proche_voisin':
+            df_res = test_unitaire(num_dataset, algo)
+        elif algo == 'genetique':
+            df_res = test_unitaire(num_dataset, algo)
+        else:
+            df_res = test_unitaire(num_dataset, algo)
         df_resultat_test = pd.concat(
             [df_resultat_test, df_res], ignore_index=True)
 
     return df_resultat_test
 
 
-def test_unitaire_2_opt(num_dataset: int) -> pd.DataFrame:
+def test_unitaire(num_dataset: int, algo: str) -> pd.DataFrame:
     """Lancement d'un test de l'algorithme 2-opt
 
     Parameters
     ----------
     num_dataset : int
-        Numéro du dataset sur lequel est réalisé le test. Ce numéro est égale à son 
+        numéro du dataset sur lequel est réalisé le test. Ce numéro est égale à son 
         index dans ENSEMBLE_TEST
+    algo : str
+        le nom de l'algorithme à utiliser
 
     Returns
     -------
@@ -57,218 +79,44 @@ def test_unitaire_2_opt(num_dataset: int) -> pd.DataFrame:
         variable stockant un ensemble de données importantes pour analyser
         l'algorithme
     """
+    if algo not in ENSEMBLE_ALGOS:
+        print(
+            "Veuillez choisir un algorithme parmi : {}".format(ENSEMBLE_ALGOS))
+        return -1
+
     # Initialisation du dataframe avec TSPLIB
     data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.tsp')
 
     # Initialisation de la matrice des distances relatives
     mat_distance = matrice_distance(data)
 
-    # On prend un chemin initial meilleur qu'un chemin aléatoire
-    # Attention chemin_initial est la liste des chemins explorés par l'algorithme
-    # plus_proche_voisin
-    chemin_initial, temps_calcul = src.algo_proche_voisin.plus_proche_voisin(
-        mat_distance)
+    if algo == '2_opt':
+        # On prend un chemin initial meilleur qu'un chemin aléatoire
+        # Attention chemin_initial est la liste des chemins explorés par l'algorithme
+        # plus_proche_voisin
+        chemin_initial, temps_calcul = src.algo_proche_voisin.plus_proche_voisin(
+            mat_distance)
 
-    # Lancement de l'algorithme 2-opt
-    df_res = src.algo_2_opt.main(mat_distance, chemin_initial)
-    # Affichage du chemin trouvé et sauvegarde de la figure
-    affichage(df_res, data, f'2-opt/chemin_{ENSEMBLE_TEST[num_dataset]}')
-    return df_res
+        # Lancement de l'algorithme 2-opt
+        df_res = src.algo_2_opt.main(mat_distance, chemin_initial)
+        # Affichage du chemin trouvé et sauvegarde de la figure
+        affichage(df_res, data, f'{algo}/chemin_{ENSEMBLE_TEST[num_dataset]}')
+    elif algo == 'plus_proche_voisin':
+        # Lancement de l'algorithme plus proche voisin
+        df_res = src.algo_proche_voisin.main(mat_distance)
+        # Affichage du chemin trouvé et sauvegarde de la figure
+        affichage(df_res, data,
+                  f'{algo}/chemin_{ENSEMBLE_TEST[num_dataset]}')
+    elif algo == 'genetique':
+        # Lancement de l'algorithme génétique
+        df_res = src.algo_genetique.main(data, mat_distance)
+        # Affichage du chemin trouvé et sauvegarde de la figure
+        affichage(df_res, data,
+                  f'{algo}/chemin_{ENSEMBLE_TEST[num_dataset]}')
+    else:
+        # Lancement de l'algorithme génétique
+        df_res = src.algo_kohonen.main(data, mat_distance)
+        # Affichage du chemin trouvé et sauvegarde de la figure
+        affichage(df_res, data, f'{algo}/chemin_{ENSEMBLE_TEST[num_dataset]}')
 
-
-def test_global_plus_proche_voisin() -> pd.DataFrame:
-    """Lancement des tests de l'algorithme plus proche voisin
-
-    Returns
-    -------
-    Dataframe 
-        variable stockant un ensemble de données importantes pour analyser
-        l'algorithme. Un ligne représente un test sur un jeu de données
-    """
-    # Dataframe à retourner, une ligne représente un test de l'algorithme sur un jeu de données
-    df_resultat_test = pd.DataFrame({
-        'Algorithme': [],
-        'Nombre de villes': [],
-        'Solution': [],
-        # Distance du trajet final
-        'Distance': [],
-        'Temps de calcul (en s)': []
-    })
-
-    for num_dataset in range(len(ENSEMBLE_TEST)):
-        # Feeback d'avancement
-        print(f"Etape du test : {num_dataset+1}/{len(ENSEMBLE_TEST)}")
-        df_res = test_unitaire_plus_proche_voisin(num_dataset)
-        df_resultat_test = pd.concat(
-            [df_resultat_test, df_res], ignore_index=True)
-
-    return df_resultat_test
-
-
-def test_unitaire_plus_proche_voisin(num_dataset: int) -> pd.DataFrame:
-    """Lancement d'un test de l'algorithme du plus proche voisin
-
-    Parameters
-    ----------
-    num_dataset : int
-        Numéro de dataset sur lequel est réalisé le test. Ce numéro est égale à son 
-        index dans ENSEMBLE_TEST
-
-    Returns
-    -------
-    Dataframe
-        variable stockant un ensemble de données importantes pour analyser
-        l'algorithme
-    """
-    # Initialisation du data frame avec TSPLIB
-    data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.tsp')
-
-    # Initialisation de la matrice des distances relatives
-    mat_distance = matrice_distance(data)
-
-    # Lancement de l'algorithme plus proche voisin
-    df_res = src.algo_proche_voisin.main(mat_distance)
-    # Affichage du chemin trouvé et sauvegarde de la figure
-    affichage(df_res, data,
-              f'proche_voisin/chemin_{ENSEMBLE_TEST[num_dataset]}')
-    return df_res
-
-
-def test_global_algo_genetique() -> pd.DataFrame:
-    """Lancement des tests de l'algorithme génétique
-
-    Returns
-    -------
-    Dataframe 
-        variable stockant un ensemble de données importantes pour analyser
-        l'algorithme. Un ligne représente un test sur un jeu de données
-    """
-    # Dataframe à retourner, une ligne représente un test de l'algorithme sur un jeu de données
-    df_resultat_test = pd.DataFrame({
-        'Algorithme': [],
-        'Nombre de villes': [],
-        'Solution': [],
-        # Distance du trajet final
-        'Distance': [],
-        'Temps de calcul (en s)': []
-    })
-
-    for num_dataset in range(len(ENSEMBLE_TEST)):
-        print(f"Etape du test : {num_dataset+1}/{len(ENSEMBLE_TEST)}")
-        df_res = test_unitaire_algo_genetique(num_dataset)
-        df_resultat_test = pd.concat(
-            [df_resultat_test, df_res], ignore_index=True)
-
-    return df_resultat_test
-
-
-def test_unitaire_algo_genetique(num_dataset):
-    """Lancement d'un test de l'algorithme génétique
-
-    Parameters
-    ----------
-    num_dataset : int
-        Numéro de dataset sur lequel est réalisé le test. Ce numéro est égale à son 
-        index dans ENSEMBLE_TEST
-
-    Returns
-    -------
-    Dataframe
-        variable stockant un ensemble de variables importantes pour analyser
-        l'algorithme
-    """
-    # Initialisation du data frame avec TSPLIB
-    data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.tsp')
-
-    # Initialisation de la matrice des distances relatives
-    mat_distance = matrice_distance(data)
-
-    # Lancement de l'algorithme génétique
-    df_res = src.algo_genetique.main(data, mat_distance)
-    # Affichage du chemin trouvé et sauvegarde de la figure
-    affichage(df_res, data, f'genetique/chemin_{ENSEMBLE_TEST[num_dataset]}')
-    return df_res
-
-
-def test_unitaire_algo_genetique(num_dataset):
-    """Lancement d'un test de l'algorithme génétique
-
-    Parameters
-    ----------
-    num_dataset : int
-        Numéro de dataset sur lequel est réalisé le test. Ce numéro est égale à son 
-        index dans ENSEMBLE_TEST
-
-    Returns
-    -------
-    Dataframe
-        variable stockant un ensemble de variables importantes pour analyser
-        l'algorithme
-    """
-    # Initialisation du data frame avec TSPLIB
-    data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.tsp')
-
-    # Initialisation de la matrice des distances relatives
-    mat_distance = matrice_distance(data)
-
-    # Lancement de l'algorithme génétique
-    df_res = src.algo_genetique.main(data, mat_distance)
-    # Affichage du chemin trouvé et sauvegarde de la figure
-    affichage(df_res, data, f'genetique/chemin_{ENSEMBLE_TEST[num_dataset]}')
-    return df_res
-
-
-def test_global_algo_kohonen() -> pd.DataFrame:
-    """Lancement des tests de l'algorithme de kohonen
-
-    Returns
-    -------
-    Dataframe 
-        variable stockant un ensemble de données importantes pour analyser
-        l'algorithme. Un ligne représente un test sur un jeu de données
-    """
-    # Dataframe à retourner, une ligne représente un test de l'algorithme sur un jeu de données
-    df_resultat_test = pd.DataFrame({
-        'Algorithme': [],
-        'Nombre de villes': [],
-        'Solution': [],
-        # Distance du trajet final
-        'Distance': [],
-        'Temps de calcul (en s)': []
-    })
-
-    for num_dataset in range(len(ENSEMBLE_TEST)):
-        print(f"Etape du test : {num_dataset+1}/{len(ENSEMBLE_TEST)}")
-        df_res = test_unitaire_algo_kohonen(num_dataset)
-        df_resultat_test = pd.concat(
-            [df_resultat_test, df_res], ignore_index=True)
-
-    return df_resultat_test
-
-
-def test_unitaire_algo_kohonen(num_dataset):
-    """Lancement d'un test de l'algorithme génétique
-
-    Parameters
-    ----------
-    num_dataset : int
-        Numéro de dataset sur lequel est réalisé le test. Ce numéro est égale à son 
-        index dans ENSEMBLE_TEST
-
-    Returns
-    -------
-    Dataframe
-        variable stockant un ensemble de variables importantes pour analyser
-        l'algorithme
-    """
-    # Initialisation du data frame avec TSPLIB
-    data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.tsp')
-
-    # Initialisation de la matrice des distances relatives
-    mat_distance = matrice_distance(data)
-
-    # Lancement de l'algorithme génétique
-    df_res = src.algo_kohonen.main(data, mat_distance)
-    # Affichage du chemin trouvé et sauvegarde de la figure
-    affichage(df_res, data, f'kohonen/chemin_{ENSEMBLE_TEST[num_dataset]}')
     return df_res
