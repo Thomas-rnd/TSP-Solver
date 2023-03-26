@@ -85,11 +85,18 @@ def trajet_en_df(trajet: list, data: pd.DataFrame) -> pd.DataFrame:
 
 def normalisation(villes: pd.DataFrame) -> pd.Series:
     """
-    Return the normalized version of a given vector of points.
+    Normalisation des coordonnées des villes afin de faciliter
+    l'apprentissage du réseau de neuronnes
 
-    For a given array of n-dimensions, normalize each dimension by removing the
-    initial offset and normalizing the points in a proportional interval: [0,1]
-    on y, maintining the original ratio on x.
+    Parameters
+    ----------
+    villes : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+
+    Returns
+    -------
+    DataFrame
+        DataFrame normalisé
     """
     ratio = (villes.x.max() - villes.x.min()) / \
         (villes.y.max() - villes.y.min()), 1
