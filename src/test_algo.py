@@ -16,7 +16,7 @@ ENSEMBLE_TEST = ['dj38', 'xqf131', 'qa194', 'xqg237',
 ENSEMBLE_ALGOS = ['2_opt', 'plus_proche_voisin', 'genetique', 'kohonen']
 
 
-def test_global(algo: str):
+def test_global(algo: str) -> pd.DataFrame:
     """Lancement de tous les tests unitaires pour un algorithme
 
     Parameters
@@ -30,11 +30,6 @@ def test_global(algo: str):
         variable stockant un ensemble de données importantes pour analyser
         l'algorithme. Un ligne représente un test sur un jeu de données
     """
-    if algo not in ENSEMBLE_ALGOS:
-        print(
-            "Veuillez choisir un algorithme parmi : {}".format(ENSEMBLE_ALGOS))
-        return -1
-
     # Dataframe à retourner, une ligne représente un test de l'algorithme
     df_resultat_test = pd.DataFrame({
         'Algorithme': [],
@@ -44,6 +39,12 @@ def test_global(algo: str):
         'Distance': [],
         'Temps de calcul (en s)': []
     })
+
+    if algo not in ENSEMBLE_ALGOS:
+        print(
+            "Veuillez choisir un algorithme parmi : {}".format(ENSEMBLE_ALGOS))
+        return df_resultat_test
+
     # Test sur l'ensemble des data
     for num_dataset in range(len(ENSEMBLE_TEST)):
         # Feeback d'avancement
@@ -62,7 +63,7 @@ def test_global(algo: str):
     return df_resultat_test
 
 
-def test_unitaire(num_dataset: int, algo: str):
+def test_unitaire(num_dataset: int, algo: str) -> pd.DataFrame:
     """Lancement d'un test unitaire pour un algorithme
 
     Parameters
@@ -79,13 +80,13 @@ def test_unitaire(num_dataset: int, algo: str):
         variable stockant un ensemble de données importantes pour analyser
         l'algorithme
     """
+    # Initialisation du dataframe avec TSPLIB
+    data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.tsp')
+
     if algo not in ENSEMBLE_ALGOS:
         print(
             "Veuillez choisir un algorithme parmi : {}".format(ENSEMBLE_ALGOS))
-        return -1
-
-    # Initialisation du dataframe avec TSPLIB
-    data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.tsp')
+        return data
 
     # Initialisation de la matrice des distances relatives
     mat_distance = matrice_distance(data)
