@@ -31,6 +31,8 @@ Run the app
 Run [Jupyter](https://jupyter.org/) in whatever way works for you. The simplest would be to run `pip install jupyter && jupyter notebook`.
 Then type the command `jupyter notebook` and the program will instantiate a local server at `localhost:8888` (or another specified port).
 
+Now you’re in the Jupyter Notebook interface, open the notebook [test_TSP_solver.ipynb](http://localhost:8888/notebooks/test_TSP_solver.ipynb) 
+
 ## Built With
 
 - [Pandas](https://pandas.pydata.org) - Data analysis and manipulation
