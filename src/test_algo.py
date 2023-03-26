@@ -30,6 +30,9 @@ def test_global(algo: str) -> pd.DataFrame:
         variable stockant un ensemble de données importantes pour analyser
         l'algorithme. Un ligne représente un test sur un jeu de données
     """
+    assert algo in ENSEMBLE_ALGOS, print(
+        "Veuillez choisir un algorithme parmi : {}".format(ENSEMBLE_ALGOS))
+
     # Dataframe à retourner, une ligne représente un test de l'algorithme
     df_resultat_test = pd.DataFrame({
         'Algorithme': [],
@@ -39,11 +42,6 @@ def test_global(algo: str) -> pd.DataFrame:
         'Distance': [],
         'Temps de calcul (en s)': []
     })
-
-    if algo not in ENSEMBLE_ALGOS:
-        print(
-            "Veuillez choisir un algorithme parmi : {}".format(ENSEMBLE_ALGOS))
-        return df_resultat_test
 
     # Test sur l'ensemble des data
     for num_dataset in range(len(ENSEMBLE_TEST)):
@@ -80,13 +78,11 @@ def test_unitaire(num_dataset: int, algo: str) -> pd.DataFrame:
         variable stockant un ensemble de données importantes pour analyser
         l'algorithme
     """
+    assert algo in ENSEMBLE_ALGOS, print(
+        "Veuillez choisir un algorithme parmi : {}".format(ENSEMBLE_ALGOS))
+
     # Initialisation du dataframe avec TSPLIB
     data = data_TSPLIB(f'data/{ENSEMBLE_TEST[num_dataset]}.tsp')
-
-    if algo not in ENSEMBLE_ALGOS:
-        print(
-            "Veuillez choisir un algorithme parmi : {}".format(ENSEMBLE_ALGOS))
-        return data
 
     # Initialisation de la matrice des distances relatives
     mat_distance = matrice_distance(data)
