@@ -19,29 +19,17 @@ The notebook will present how well an algorithm succeed to resolve the Travellin
 
 ### Running the app locally
 
-First create a virtual environment with conda or venv inside a temp folder, then activate it.
-
-```
-cd temp
-python3 -m venv venv
-
-# Windows
-venv\Scripts\activate
-# Or Linux and Mac
-source venv/bin/activate
-```
-
-Clone the git repo, then install the requirements with pip
+Clone the git repository
 
 ```
 git clone https://github.com/Thomas-rnd/TSP_solver
 cd TSP_solver
-pip install -r requirements.txt
 ```
 
 Run the app
 
 Run [Jupyter](https://jupyter.org/) in whatever way works for you. The simplest would be to run `pip install jupyter && jupyter notebook`.
+Then type the command `jupyter notebook` and the program will instantiate a local server at `localhost:8888` (or another specified port).
 
 ## Built With
 
