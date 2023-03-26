@@ -2,9 +2,9 @@
 
 This repository contains an implementation of several algorithms that can be
 used to find sub-optimal solutions for the Traveling Salesman Problem. The
-instances of the problems that the program supports are =.tsp= files, which is
+instances of the problems that the program supports are `.tsp` files, which is
 a widespread format in this problem. All the source code can be found in the
-=src= directory.
+`src` directory.
 
 ## Getting Started
 
@@ -35,7 +35,7 @@ Clone the git repo, then install the requirements with pip
 
 ```
 git clone https://github.com/Thomas-rnd/TSP_solver
-cd dash_TSP
+cd TSP_solver
 pip install -r requirements.txt
 ```
 
