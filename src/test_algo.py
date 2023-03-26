@@ -16,8 +16,8 @@ ENSEMBLE_TEST = ['dj38', 'xqf131', 'qa194', 'xqg237',
 ENSEMBLE_ALGOS = ['2_opt', 'plus_proche_voisin', 'genetique', 'kohonen']
 
 
-def test_global(algo: str) -> pd.DataFrame:
-    """Lancement des tests de l'algorithme 2-opt
+def test_global(algo: str):
+    """Lancement de tous les tests unitaires pour un algorithme
 
     Parameters
     ----------
@@ -57,13 +57,13 @@ def test_global(algo: str) -> pd.DataFrame:
         else:
             df_res = test_unitaire(num_dataset, algo)
         df_resultat_test = pd.concat(
-            [df_resultat_test, df_res], ignore_index=True)
+            [df_resultat_test, df_res], ignore_index=True)  # type: ignore
 
     return df_resultat_test
 
 
-def test_unitaire(num_dataset: int, algo: str) -> pd.DataFrame:
-    """Lancement d'un test de l'algorithme 2-opt
+def test_unitaire(num_dataset: int, algo: str):
+    """Lancement d'un test unitaire pour un algorithme
 
     Parameters
     ----------

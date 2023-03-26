@@ -8,7 +8,7 @@ from src.affichage_resultats import affichage
 from src.init_test_data import data_TSPLIB, trajet_en_df
 
 
-def plus_proche_voisin(matrice_distance: np.array):
+def plus_proche_voisin(matrice_distance: np.ndarray):
     """Retourne le trajet trouvé en se déplacement de proche en proche.
 
     La ville de départ étant arbitraire on choisit la ville d'index 0
@@ -20,7 +20,7 @@ def plus_proche_voisin(matrice_distance: np.array):
 
     Returns
     -------
-    chemin_explores : list
+    itineraire : list
         le chemin finalement trouvé
     temps_calcul : float
         temps necessaire à la résolution du problème
@@ -51,7 +51,7 @@ def plus_proche_voisin(matrice_distance: np.array):
         # On donne l'état visité à la ville
         visite[plus_proche] = True
 
-        itineraire.append(plus_proche)
+        itineraire.append(int(plus_proche))
     # On fait attention à fermer le cycle
     itineraire.append(itineraire[0])
 
@@ -59,7 +59,7 @@ def plus_proche_voisin(matrice_distance: np.array):
     return itineraire, temps_calcul
 
 
-def main(matrice_distance: np.array) -> pd.DataFrame:
+def main(matrice_distance: np.ndarray) -> pd.DataFrame:
     """Lancement de l'algorithme de recherche 
 
     Parameters

@@ -17,7 +17,7 @@ from src.init_test_data import data_TSPLIB, trajet_en_df
 # Cf. https://fr.wikipedia.org/wiki/2-opt
 
 
-def gain(matrice_distance: np.array, meilleur_chemin: list, i: int, j: int) -> float:
+def gain(matrice_distance: np.ndarray, meilleur_chemin: list, i: int, j: int) -> float:
     """Gain de distance en parcourant en sens inverse une suite de ville.
 
     On vient calculer la différence de distance entre la somme des anciennes arêtes et
@@ -26,7 +26,7 @@ def gain(matrice_distance: np.array, meilleur_chemin: list, i: int, j: int) -> f
 
     Parameters
     ----------
-    matrice_distance : np.array
+    matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
     meilleur_chemin : list
         suite de villes donnant le chemin parcouru
@@ -77,7 +77,7 @@ def inversion(liste: list, debut_inversion: int, fin_inversion: int) -> list:
     return nouvelle_liste
 
 
-def deux_opt(itineraire_initial: list, matrice_distance: np.array):
+def deux_opt(itineraire_initial: list, matrice_distance: np.ndarray):
     """Recherche de deux arêtes sécantes.
 
     Cette fonction implémente l'algorithme 2-opt décrit sur wikipédia.
@@ -87,13 +87,13 @@ def deux_opt(itineraire_initial: list, matrice_distance: np.array):
     itineraire_initial : list
         suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément
         sur la solution finale trouvée.
-    matrice_distance : np.array
+    matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
 
     Returns
     -------
     chemin_explores : list
-        l'ensemble des chemins sub-optimal trouvés
+        le chemin final trouvé
     temps_calcul : int
         temps necessaire à la résolution du problème
     """
@@ -124,16 +124,15 @@ def deux_opt(itineraire_initial: list, matrice_distance: np.array):
     return meilleur_chemin, temps_calcul
 
 
-def main(matrice_distance: np.array, chemin_initial: list) -> pd.DataFrame:
+def main(matrice_distance: np.ndarray, chemin_initial: list) -> pd.DataFrame:
     """Lancement de l'algorithme de recherche
 
     Parameters
     ----------
-    matrice_distance : np.array
+    data : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
-    chemin_initial : list
-        suite de villes donnant le chemin parcouru. Ce chemin initial influ énormément
-        sur la solution finale trouvée.
 
     Returns
     -------

@@ -83,7 +83,7 @@ def trajet_en_df(trajet: list, data: pd.DataFrame) -> pd.DataFrame:
     return df_res
 
 
-def normalisation(villes):
+def normalisation(villes: pd.DataFrame) -> pd.Series:
     """
     Return the normalized version of a given vector of points.
 

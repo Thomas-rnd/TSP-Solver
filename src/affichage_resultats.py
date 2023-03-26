@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -8,43 +8,7 @@ import plotly.graph_objects as go
 from src.init_test_data import trajet_en_df
 
 
-def representation_itineraire_back(data: pd.DataFrame, reseau_neurones=[]):
-    """Affichage des N villes par des points ainsi que le parcours réalisé
-       Le parcours est donné par l'ordre des villes dans le dataframe
-
-    Parameters
-    ----------
-    data : DataFrame
-        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
-    reseau_neurones : list
-        list stockant un réseau de neurone de kohonen
-    """
-    # Affichage des points
-    plt.scatter(data.iloc[0, :], data.iloc[1, :], zorder=1)
-    # Repérage du point initial par un cercle rouge
-    plt.scatter(data.iloc[0, 0], data.iloc[1, 0], zorder=1,
-                color="red", marker='o', label='Point de Départ')
-    plt.legend(loc="upper right")
-
-    if (reseau_neurones == []):
-        # Affichage des traits
-        plt.plot(data.iloc[0, :], data.iloc[1, :], zorder=1)
-        plt.title('Chemin parcouru par le marchand', loc='center')
-        # Pour une visualisation plus proche de la réalité
-        # plt.axis("equal")
-    else:
-        x = [neurone[0] for neurone in reseau_neurones]
-        y = [neurone[1] for neurone in reseau_neurones]
-        # Affichage des neurones
-        plt.scatter(x, y, zorder=1,
-                    color="green", marker='x', label='Réseau de Kohonen')
-        # Affichage des traits
-        plt.plot(x, y, zorder=1)
-        plt.title('Chemin parcouru par le réseau', loc='center')
-    plt.show()
-
-
-def representation_itineraire_web(data: pd.DataFrame) -> px.line:
+def representation_itineraire_web(data: pd.DataFrame) -> go.Figure:
     """Affichage des N villes par des points ainsi que le parcours réalisé
        Le parcours est donné par l'ordre des villes dans le dataframe
 
@@ -59,7 +23,7 @@ def representation_itineraire_web(data: pd.DataFrame) -> px.line:
         Graphique de visualisation plolty
     """
     fig = px.scatter(data, x='x', y='y', template="simple_white",
-                     title="Shortest path find by the algorithm")
+                     title="Shortest path found by the algorithm")
     fig.add_trace(
         go.Scatter(
             x=data['x'].values,
@@ -73,7 +37,7 @@ def representation_itineraire_web(data: pd.DataFrame) -> px.line:
     return fig
 
 
-def representation_reseau(data: pd.DataFrame, neurones: np.array) -> px.line:
+def representation_reseau(data: pd.DataFrame, neurones: np.ndarray) -> go.Figure:
     """Affichage des N villes par des points ainsi que la projection du réseaux
     de neurones sur l'espace des villes
 
@@ -81,7 +45,7 @@ def representation_reseau(data: pd.DataFrame, neurones: np.array) -> px.line:
     ----------
     data : DataFrame
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
-    reseau_neurones : list
+    reseau_neurones : ndarray
         list stockant un réseau de neurone de kohonen
 
     Returns
@@ -103,7 +67,7 @@ def representation_reseau(data: pd.DataFrame, neurones: np.array) -> px.line:
     return fig
 
 
-def representation_temps_calcul(fichier_csv: str) -> px.line:
+def representation_temps_calcul(fichier_csv: str) -> go.Figure:
     """Affichage des du temps de calcul des différents algorithmes implémentés
     en fonction du nombre de ville évalué
 
@@ -130,7 +94,7 @@ def representation_temps_calcul(fichier_csv: str) -> px.line:
     return fig
 
 
-def representation_resultats(fichier_csv: str) -> px.box:
+def representation_resultats(fichier_csv: str) -> go.Figure:
     """Affichage des distances des chemins trouvés par algorithme
 
     Parameters
@@ -153,8 +117,9 @@ def representation_resultats(fichier_csv: str) -> px.box:
     return fig
 
 
-def affichage(df_resolution: pd.DataFrame, data: pd.DataFrame, nom_fichier="") -> px.line:
+def affichage(df_resolution: pd.DataFrame, data: pd.DataFrame, nom_fichier="") -> go.Figure:
     """Affichage d'un trajet et des performances d'un algorithme
+
     Parameters
     ----------
     df_resolution : Dataframe
@@ -164,6 +129,7 @@ def affichage(df_resolution: pd.DataFrame, data: pd.DataFrame, nom_fichier="") -
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     nom_fichier : str (optionnel)
         Nom du fichier si on souhaite sauvegarder la figure crée
+
     Returns
     -------
     Figure

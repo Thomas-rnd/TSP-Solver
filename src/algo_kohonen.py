@@ -3,12 +3,13 @@ import time
 import numpy as np
 import pandas as pd
 
-from src.affichage_resultats import representation_itineraire_web, representation_reseau
-from src.distance import distance_euclidienne, distance_trajet, neurone_gagnant
-from src.init_test_data import data_TSPLIB, normalisation
+from src.affichage_resultats import (representation_itineraire_web,
+                                     representation_reseau)
+from src.distance import distance_trajet, neurone_gagnant
+from src.init_test_data import normalisation
 
 
-def creation_reseau(taille: int) -> np.array:
+def creation_reseau(taille: int) -> np.ndarray:
     """
     Création d'un réseau d'un taille donnée
 
@@ -19,13 +20,13 @@ def creation_reseau(taille: int) -> np.array:
 
     Returns
     -------
-    np.array
+    np.ndarray
         un ensemble de taille neurones de dimension 2 dans l'intervalle [0,1)
     """
     return np.random.rand(taille, 2)
 
 
-def voisinage(index_neuronne_gagnant: int, rayon: int, nombre_neurones: int) -> np.array:
+def voisinage(index_neuronne_gagnant: int, rayon: float, nombre_neurones: int) -> np.ndarray:
     """Génération d'une gaussienne à valeur dans [0,1] centrée en index_neuronne_gagnant
     et d'écart type rayon. Cette gaussienne permet de modéliser l'attirance du cycle de neuronne.
     Cette fonction est periodique et de période le nombre_neurones.
@@ -34,14 +35,14 @@ def voisinage(index_neuronne_gagnant: int, rayon: int, nombre_neurones: int) -> 
     ----------
     index_neuronne_gagnant : int 
         index du neuronne gagnant dans le réseaux de kohonen. Moyenne de la gaussienne
-    rayon : int 
+    rayon : float 
         écart type de la gaussienne. (rayon d'influence du neuronne gagnant)
     nombre_neurones : int
         nombre de neurones dans le réseau
 
     Returns
     -------
-    np.array
+    np.ndarray
         la gaussienne discrête modélisant l'attraction ainsi crée
     """
 
@@ -54,10 +55,10 @@ def voisinage(index_neuronne_gagnant: int, rayon: int, nombre_neurones: int) -> 
     distances = np.minimum(deltas, nombre_neurones - deltas)
 
     # Génération de la distribution gaussienne autour du neurone gagnant
-    return np.exp(-(distances*distances) / (2*(rayon*rayon)))
+    return np.exp(-(distances*distances) / (2*(rayon*rayon)))  # type: ignore
 
 
-def chemin_final(villes: pd.DataFrame, neurones: np.array) -> list:
+def chemin_final(villes: pd.DataFrame, neurones: np.ndarray) -> list:
     """Recherche du chemin final trouvé par le réseau. 
 
     Pour cela on atitre à chacune des villes son neurone gagnant et ensuite
@@ -68,7 +69,7 @@ def chemin_final(villes: pd.DataFrame, neurones: np.array) -> list:
     ----------
     villes : DataFrame 
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
-    neurones : np.array 
+    neurones : np.ndarray 
         un ensemble de neuronnes de dimension 2 dans l'intervalle [0,1)
 
     Returns
@@ -77,7 +78,7 @@ def chemin_final(villes: pd.DataFrame, neurones: np.array) -> list:
         dataframe final des villes ordonnées
     """
     villes['ordre'] = villes[['x', 'y']].apply(
-        lambda c: neurone_gagnant(neurones, c),
+        lambda c: int(neurone_gagnant(neurones, c)),
         # 1 or 'columns': on applique la fonction à chaque ligne.
         axis=1, raw=True)
     # Retourne un array représentant les données de l'index
@@ -100,8 +101,10 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
 
     Returns
     -------
-    np.array
-        la gaussienne discrête modélisant l'attraction ainsi crée
+    itineraire : list
+        le chemin final trouvé
+    temps_calcul : int
+        temps necessaire à la résolution du problème
 
     """
     start_time = time.time()
@@ -130,7 +133,7 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
         ville = villes.sample(1)[['x', 'y']].values
         index_gagnant = neurone_gagnant(neurones, ville)
         # Génération d'un filtre gaussien modélisant l'attraction entre un neurone et ses voisins
-        gaussian = voisinage(index_gagnant, n//10, neurones.shape[0])
+        gaussian = voisinage(int(index_gagnant), n//10, neurones.shape[0])
         # Mise à jour des poids des neurones (proche de la ville initiale)
         # np.newaxis pour contrôler le broadcasting
         neurones += gaussian[:, np.newaxis] * \
@@ -157,8 +160,15 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
     return itineraire, temps_calcul
 
 
-def main(data, mat_distance) -> pd.DataFrame:
+def main(data: pd.DataFrame, mat_distance: np.ndarray) -> pd.DataFrame:
     """Lancement de l'algorithme de kohonen
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+    matrice_distance : np.ndarray
+        matrice stockant l'integralité des distances inter villes
 
     Returns
     -------

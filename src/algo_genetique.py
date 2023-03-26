@@ -24,7 +24,7 @@ ERREUR_SUR_CHEMIN = 25
 NOMBRE_EPOCH = 100
 
 
-def init_population(nombre_de_trajet: int, data: pd.DataFrame, matrice_distance: np.array) -> list[dict]:
+def init_population(nombre_de_trajet: int, data: pd.DataFrame, matrice_distance: np.ndarray) -> list[dict]:
     """Initialisation de la population initiale 
 
     Construction d'une population initiale de N solutions.
@@ -36,7 +36,7 @@ def init_population(nombre_de_trajet: int, data: pd.DataFrame, matrice_distance:
         taille de la population initiale
     data : DataFrame
         dataframe stockant l'intégralité des coordonnées des villes à parcourir
-    matrice_distance : np.array
+    matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
 
     Returns
@@ -78,7 +78,7 @@ def individus_ordonnes(trajets: list[dict]):
     return sorted(trajets, key=lambda x: x['Distance'])
 
 
-def selection(trajets: list[dict], pourcentage: int) -> list[dict]:
+def selection(trajets: list[dict], pourcentage: float) -> list[dict]:
     """Sélection des n meilleurs
 
     Parmi la population totale on ne conserve qu'un petit pourcentage
@@ -103,7 +103,7 @@ def selection(trajets: list[dict], pourcentage: int) -> list[dict]:
     return trajets
 
 
-def probabilite(pourcentage: int) -> bool:
+def probabilite(pourcentage: float) -> bool:
     """Tirage aléatoire simulant une probabilité de succés
 
     Parameters
@@ -176,7 +176,7 @@ def mutation_aleatoire(trajet: dict) -> dict:
     return (enfant)
 
 
-def generation(trajets_originels: list[dict], nombre_de_trajet: int, pourcentage_mutation: int, matrice_distance: np.array) -> list[dict]:
+def generation(trajets_originels: list[dict], nombre_de_trajet: int, pourcentage_mutation: float, matrice_distance: np.ndarray) -> list[dict]:
     """Génération d'une nouvelle population de N trajets
 
     Generation de m nouveaux trajets pour compléter la population sélectionnée. Ces nouveaux
@@ -190,7 +190,7 @@ def generation(trajets_originels: list[dict], nombre_de_trajet: int, pourcentage
         taille de la population initiale
     pourcentage_mutation : int
         probabilité qu'un trajet mute
-    matrice_distance : list
+    matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
 
     Returns
@@ -208,7 +208,7 @@ def generation(trajets_originels: list[dict], nombre_de_trajet: int, pourcentage
     return trajets_originels
 
 
-def evaluation(trajet: dict, matrice_distance: np.array) -> dict:
+def evaluation(trajet: dict, matrice_distance: np.ndarray) -> dict:
     """Fonction d'évaluation de l'algorithme
 
     Evaluation de la population. Plus un trajet est court plus il est considéré comme bon
@@ -217,7 +217,7 @@ def evaluation(trajet: dict, matrice_distance: np.array) -> dict:
     ----------
     trajet : dict
         ordre de parcours des villes avec distance relative
-    matrice_distance : np.array
+    matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
 
     Returns
@@ -231,14 +231,14 @@ def evaluation(trajet: dict, matrice_distance: np.array) -> dict:
     return maj_trajet
 
 
-def main(data: pd.DataFrame, matrice_distance: np.array) -> pd.DataFrame:
+def main(data: pd.DataFrame, matrice_distance: np.ndarray) -> pd.DataFrame:
     """Lancement de l'algorithme de recherche 
 
     Parameters
     ----------
     data : DataFrame
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
-    matrice_distance : np.array
+    matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
 
     Returns
@@ -270,7 +270,7 @@ def main(data: pd.DataFrame, matrice_distance: np.array) -> pd.DataFrame:
             meilleurs_trajets, NOMBRE_TRAJET, POURCENTAGE_MUTATION, matrice_distance)
 
     # Chemin final trouvé
-    solution = meilleurs_trajets[0]['Villes']
+    solution = trajets_initiaux[0]['Villes']
     distance = distance_trajet(solution, matrice_distance)
     temps_calcul = time.time() - start
 

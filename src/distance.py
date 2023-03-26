@@ -3,26 +3,26 @@ import pandas as pd
 from scipy.spatial import distance
 
 
-def distance_euclidienne(a: np.float_, b: np.float_) -> np.float_:
+def distance_euclidienne(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
     Retourne un np.array des distances entre 2 np.array de points.
 
     Parameters
     ----------
-    a : np.float_
+    a : np.ndarray
         vecteur de point 2D
-    b : np.float_
+    b : np.ndarray
         vecteur de point 2D
 
     Returns
     -------
-    np.float_
+    np.ndarray
         vecteur des distances
     """
     return np.linalg.norm(a - b, axis=1)
 
 
-def matrice_distance(villes: pd.DataFrame) -> np.array:
+def matrice_distance(villes: pd.DataFrame) -> np.ndarray:
     """
     Retourne une matrice stockant les distances inter villes. Cette matrice renseigne
     sur la distance entre la ville X et la ville Y à la position (X,Y).
@@ -34,7 +34,7 @@ def matrice_distance(villes: pd.DataFrame) -> np.array:
 
     Returns
     -------
-    Dataframe
+    np.ndarray
         matrice stockant l'integralité des distances inter villes
     """
     dist_matrice = distance.cdist(
@@ -45,14 +45,14 @@ def matrice_distance(villes: pd.DataFrame) -> np.array:
     return dist_matrice
 
 
-def distance_trajet(itineraire: list, matrice_distance: np.array) -> float:
+def distance_trajet(itineraire: list, matrice_distance: np.ndarray) -> float:
     """Calcul de la distance totale d'un trajet
 
     Parameters
     ----------
     itineraire : list
         Liste ordonnées des villes parcourues
-    matrice_distance : np.array
+    matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
 
     Returns
@@ -67,19 +67,19 @@ def distance_trajet(itineraire: list, matrice_distance: np.array) -> float:
     return distance
 
 
-def neurone_gagnant(neurones, ville):
+def neurone_gagnant(neurones: np.ndarray, ville: np.ndarray) -> np.intp:
     """On cherche le neurone le plus proche d'une ville donnée
 
     Parameters
     ----------
-    neurones : np.array
+    neurones : np.ndarray
         liste du réseau de neuronnes
-    ville : np.array
+    ville : np.ndarray
         coordonnées 2D d'une ville donnée
 
     Returns
     -------
-    int
+    intp
         l'index du neurone gagnant
     """
     return distance_euclidienne(neurones, ville).argmin()
