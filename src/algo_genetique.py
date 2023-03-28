@@ -230,7 +230,7 @@ def evaluation(trajet: dict, matrice_distance: np.ndarray) -> dict:
     return maj_trajet
 
 
-def main(data: pd.DataFrame, matrice_distance: np.ndarray) -> pd.DataFrame:
+def main(data: pd.DataFrame, matrice_distance: np.ndarray, nom_dataset: str) -> pd.DataFrame:
     """Lancement de l'algorithme de recherche 
 
     Parameters
@@ -239,6 +239,8 @@ def main(data: pd.DataFrame, matrice_distance: np.ndarray) -> pd.DataFrame:
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
+    nom_dataset : str
+        Nom du dataset à traiter
 
     Returns
     -------
@@ -275,8 +277,9 @@ def main(data: pd.DataFrame, matrice_distance: np.ndarray) -> pd.DataFrame:
 
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
-        'Algorithme': "Génétique",
-        'Nombre de villes': len(solution)-1,
+        'Algorithme': "genetique",
+        'Nom dataset': nom_dataset,
+        'Nombre de villes': len(solution),
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [solution],
         # Distance du trajet final
