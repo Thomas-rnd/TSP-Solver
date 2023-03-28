@@ -151,7 +151,7 @@ def main(matrice_distance: np.ndarray, chemin_initial: list) -> pd.DataFrame:
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
         'Algorithme': "2-opt",
-        'Nombre de villes': len(chemin_initial),
+        'Nombre de villes': len(chemin_initial)-1,
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [solution],
         # Distance du trajet final

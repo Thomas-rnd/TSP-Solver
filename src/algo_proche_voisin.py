@@ -85,7 +85,7 @@ def main(matrice_distance: np.ndarray) -> pd.DataFrame:
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
         'Algorithme': "Plus proche voisin",
-        'Nombre de villes': len(solution),
+        'Nombre de villes': len(solution)-1,
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [solution],
         # Distance du trajet final

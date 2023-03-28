@@ -188,7 +188,7 @@ def main(data: pd.DataFrame, mat_distance: np.ndarray) -> pd.DataFrame:
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
         'Algorithme': "Kohonen",
-        'Nombre de villes': len(itineraire),
+        'Nombre de villes': len(itineraire)-1,
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [itineraire],
         # Distance du trajet final
