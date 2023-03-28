@@ -37,7 +37,6 @@ def data_TSPLIB(fichier: str) -> pd.DataFrame:
         # On définit le point de référence au début du fichier
         f.seek(0)
 
-        # Read a data frame out of the file descriptor
         villes = pd.read_csv(
             f,
             # On commence la lecture du fichier au bon endroit
