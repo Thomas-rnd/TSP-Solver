@@ -3,8 +3,6 @@ import time
 import numpy as np
 import pandas as pd
 
-from src.affichage_resultats import (representation_itineraire_web,
-                                     representation_reseau)
 from src.distance import distance_trajet, neurone_gagnant
 from src.init_test_data import normalisation
 
@@ -105,7 +103,8 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
         le chemin final trouvé
     temps_calcul : int
         temps necessaire à la résolution du problème
-
+    evolution_reseau : list
+        stockage de l'évolution du réseau de neurones
     """
     start_time = time.time()
 
@@ -119,6 +118,9 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
     # Génération du réseau de neurones
     neurones = creation_reseau(n)
     # print('Réseau de {} neurones créé. On commence les itérations :'.format(n))
+
+    # Stockage de l'évolution du réseau de neurones
+    evolution_reseau = [neurones.copy()]
 
     for i in range(iterations):
         if not i % 100:
@@ -138,6 +140,7 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
         # np.newaxis pour contrôler le broadcasting
         neurones += gaussian[:, np.newaxis] * \
             taux_apprentissage * (ville - neurones)
+        evolution_reseau.append(neurones.copy())
         # Mise à jour du taux d'apprentissage
         taux_apprentissage = taux_apprentissage * 0.99997
         # Réduction de la distance d'influence d'un neurone
@@ -157,10 +160,10 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
     villes = villes.reindex(itineraire)
     temps_calcul = time.time() - start_time
 
-    return itineraire, temps_calcul
+    return itineraire, temps_calcul, evolution_reseau
 
 
-def main(data: pd.DataFrame, mat_distance: np.ndarray) -> pd.DataFrame:
+def main(data: pd.DataFrame, mat_distance: np.ndarray, nom_dataset: str) -> pd.DataFrame:
     """Lancement de l'algorithme de kohonen
 
     Parameters
@@ -169,6 +172,8 @@ def main(data: pd.DataFrame, mat_distance: np.ndarray) -> pd.DataFrame:
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
+    nom_dataset : str
+        Nom du dataset à traiter
 
     Returns
     -------
@@ -177,7 +182,7 @@ def main(data: pd.DataFrame, mat_distance: np.ndarray) -> pd.DataFrame:
         l'algorithme
     """
     # On récupère lechemin trouvé et le temps de résolution de l'algorithme
-    itineraire, temps_calcul = som(data, 100000)
+    itineraire, temps_calcul, evolution_reseau = som(data, 100000)
 
     # Dataframe final trouvé. On donne comme nouvel index à data la liste itinéraire
     # solution = data.reindex(itineraire)
@@ -187,10 +192,12 @@ def main(data: pd.DataFrame, mat_distance: np.ndarray) -> pd.DataFrame:
 
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
-        'Algorithme': "Kohonen",
-        'Nombre de villes': len(itineraire)-1,
+        'Algorithme': "kohonen",
+        'Nom dataset': nom_dataset,
+        'Nombre de villes': len(itineraire),
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [itineraire],
+        'Chemins explorés': [evolution_reseau],
         # Distance du trajet final
         'Distance': distance_chemin_sub_optimal,
         'Temps de calcul (en s)': temps_calcul
