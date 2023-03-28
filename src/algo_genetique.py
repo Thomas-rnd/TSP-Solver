@@ -230,7 +230,7 @@ def evaluation(trajet: dict, matrice_distance: np.ndarray) -> dict:
     return maj_trajet
 
 
-def main(data: pd.DataFrame, matrice_distance: np.ndarray, nom_dataset: str) -> pd.DataFrame:
+def main(data: pd.DataFrame, matrice_distance: np.ndarray, nom_dataset="") -> pd.DataFrame:
     """Lancement de l'algorithme de recherche 
 
     Parameters
@@ -239,7 +239,7 @@ def main(data: pd.DataFrame, matrice_distance: np.ndarray, nom_dataset: str) -> 
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
-    nom_dataset : str
+    nom_dataset : str (optionnel)
         Nom du dataset à traiter
 
     Returns

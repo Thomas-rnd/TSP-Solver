@@ -128,7 +128,7 @@ def deux_opt(itineraire_initial: list, matrice_distance: np.ndarray):
     return meilleur_chemin, temps_calcul, chemins_explores
 
 
-def main(matrice_distance: np.ndarray, chemin_initial: list, nom_dataset: str) -> pd.DataFrame:
+def main(matrice_distance: np.ndarray, chemin_initial: list, nom_dataset="") -> pd.DataFrame:
     """Lancement de l'algorithme de recherche
 
     Parameters
@@ -137,7 +137,7 @@ def main(matrice_distance: np.ndarray, chemin_initial: list, nom_dataset: str) -
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
-    nom_dataset : str
+    nom_dataset : str (optionnel)
         Nom du dataset à traiter
 
     Returns

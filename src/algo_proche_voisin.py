@@ -67,14 +67,14 @@ def plus_proche_voisin(matrice_distance: np.ndarray):
     return itineraire, temps_calcul, chemins_explores
 
 
-def main(matrice_distance: np.ndarray, nom_dataset: str) -> pd.DataFrame:
+def main(matrice_distance: np.ndarray, nom_dataset="") -> pd.DataFrame:
     """Lancement de l'algorithme de recherche 
 
     Parameters
     ----------
     matrice_distance : np.array
         matrice stockant l'integralité des distances inter villes
-    nom_dataset : str
+    nom_dataset : str (optionnel)
         Nom du dataset à traiter
 
     Returns

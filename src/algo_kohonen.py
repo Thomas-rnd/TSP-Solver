@@ -163,7 +163,7 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
     return itineraire, temps_calcul, evolution_reseau
 
 
-def main(data: pd.DataFrame, mat_distance: np.ndarray, nom_dataset: str) -> pd.DataFrame:
+def main(data: pd.DataFrame, mat_distance: np.ndarray, nom_dataset="") -> pd.DataFrame:
     """Lancement de l'algorithme de kohonen
 
     Parameters
@@ -172,7 +172,7 @@ def main(data: pd.DataFrame, mat_distance: np.ndarray, nom_dataset: str) -> pd.D
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
-    nom_dataset : str
+    nom_dataset : str (optionnel)
         Nom du dataset à traiter
 
     Returns
