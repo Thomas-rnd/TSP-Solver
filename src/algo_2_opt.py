@@ -3,9 +3,7 @@ import time
 import numpy as np
 import pandas as pd
 
-from src.affichage_resultats import affichage
 from src.distance import distance_trajet
-from src.init_test_data import data_TSPLIB, trajet_en_df
 
 
 # En s'inspirant de la documentation wikipedia sur le 2-opt pour résoudre le TSP, nous
@@ -96,6 +94,8 @@ def deux_opt(itineraire_initial: list, matrice_distance: np.ndarray):
         le chemin final trouvé
     temps_calcul : int
         temps necessaire à la résolution du problème
+    chemins_explores : list
+        stockage de l'ensemble des chemins explorés
     """
     start_time = time.time()
 
@@ -104,6 +104,9 @@ def deux_opt(itineraire_initial: list, matrice_distance: np.ndarray):
     meilleur_chemin = itineraire_initial
     meilleur_distance = distance_trajet(meilleur_chemin, matrice_distance)
     nombre_ville = len(meilleur_chemin)
+
+    # Stockage de l'ensemble des trajets explorés
+    chemins_explores = [meilleur_chemin]
 
     while amelioration:
         amelioration = False
@@ -118,13 +121,14 @@ def deux_opt(itineraire_initial: list, matrice_distance: np.ndarray):
                     if (nouvelle_distance < meilleur_distance):
                         meilleur_chemin = nouveau_chemin
                         meilleur_distance = nouvelle_distance
+                        chemins_explores.append(nouveau_chemin)
                         amelioration = True
 
     temps_calcul = time.time() - start_time
-    return meilleur_chemin, temps_calcul
+    return meilleur_chemin, temps_calcul, chemins_explores
 
 
-def main(matrice_distance: np.ndarray, chemin_initial: list) -> pd.DataFrame:
+def main(matrice_distance: np.ndarray, chemin_initial: list, nom_dataset: str) -> pd.DataFrame:
     """Lancement de l'algorithme de recherche
 
     Parameters
@@ -133,6 +137,8 @@ def main(matrice_distance: np.ndarray, chemin_initial: list) -> pd.DataFrame:
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
+    nom_dataset : str
+        Nom du dataset à traiter
 
     Returns
     -------
@@ -141,7 +147,8 @@ def main(matrice_distance: np.ndarray, chemin_initial: list) -> pd.DataFrame:
         l'algorithme
     """
     # On récupère lechemin trouvé et le temps de résolution de l'algorithme
-    itineraire, temps_calcul = deux_opt(chemin_initial, matrice_distance)
+    itineraire, temps_calcul, chemins_explores = deux_opt(
+        chemin_initial, matrice_distance)
 
     # Calcul de la distance du trajet final trouvé par l'algorithme
     distance_chemin_sub_optimal = distance_trajet(itineraire, matrice_distance)
@@ -151,9 +158,11 @@ def main(matrice_distance: np.ndarray, chemin_initial: list) -> pd.DataFrame:
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
         'Algorithme': "2-opt",
-        'Nombre de villes': len(chemin_initial)-1,
+        'Nom dataset': nom_dataset,
+        'Nombre de villes': len(chemin_initial),
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [solution],
+        'Chemins explorés': [chemins_explores],
         # Distance du trajet final
         'Distance': distance_chemin_sub_optimal,
         'Temps de calcul (en s)': temps_calcul
