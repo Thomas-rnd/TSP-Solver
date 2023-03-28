@@ -4,9 +4,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 from src.init_test_data import trajet_en_df
+from src.init_test_data import data_TSPLIB
 
 
-def representation_itineraire_web(data: pd.DataFrame) -> go.Figure:
+def representation_itineraire_web(data: pd.DataFrame, nom_fichier="") -> go.Figure:
     """Affichage des N villes par des points ainsi que le parcours réalisé
        Le parcours est donné par l'ordre des villes dans le dataframe
 
@@ -32,10 +33,13 @@ def representation_itineraire_web(data: pd.DataFrame) -> go.Figure:
     )
     fig.update_xaxes(zeroline=False, visible=False)
     fig.update_yaxes(zeroline=False, visible=False)
+    # Sauvegarde de la figure au format .png
+    if (nom_fichier != ""):
+        fig.write_image(nom_fichier)
     return fig
 
 
-def representation_reseau(data: pd.DataFrame, neurones: np.ndarray) -> go.Figure:
+def representation_reseau(data: pd.DataFrame, neurones: np.ndarray, nom_fichier="") -> go.Figure:
     """Affichage des N villes par des points ainsi que la projection du réseaux
     de neurones sur l'espace des villes
 
@@ -62,6 +66,8 @@ def representation_reseau(data: pd.DataFrame, neurones: np.ndarray) -> go.Figure
     )
     fig.update_xaxes(zeroline=False, visible=False)
     fig.update_yaxes(zeroline=False, visible=False)
+    if (nom_fichier != ""):
+        fig.write_image(nom_fichier)
     return fig
 
 
@@ -158,7 +164,6 @@ def affichage(df_resolution: pd.DataFrame, data: pd.DataFrame, nom_fichier="") -
     # Création d'un dataframe complet issu de la solution trouvée
     df_meilleur_trajet = trajet_en_df(
         df_resolution['Solution'][0], data)
-    # fig = representation_itineraire(df_meilleur_trajet)
     fig = representation_itineraire_web(df_meilleur_trajet)
     # Sauvegarde de la figure au format .png
     if (nom_fichier != ""):
@@ -171,5 +176,31 @@ def affichage(df_resolution: pd.DataFrame, data: pd.DataFrame, nom_fichier="") -
     # print("Temps de calcul (en s): ",
     #      df_resolution["Temps de calcul (en s)"][0])
     # print("=============================================")
-
     return fig
+
+
+def affichage_chemins_explores(df_resolution: pd.DataFrame, algorithme: str, dataset: str):
+    """Sauvegarde des chemins explorés par un algorithme 
+
+    Parameters
+    ----------
+    df_resolution : Dataframe
+        variable stockant un ensemble de variables importantes pour analyser
+        l'algorithme
+    algorithme : str
+        Nom de l'algorithme à traiter
+    dataset : str 
+        Nom du dataset à traiter
+    """
+    # On récupère la liste des chemins explorés de ligne associé au bon algorithme et au bon dataset
+    chemins_explores = df_resolution.loc[(df_resolution["Algorithme"] == algorithme) & (
+        df_resolution["Nom dataset"] == dataset)]["Chemins explorés"]
+    # On génère le dataframe associé à ce dataset
+    data = data_TSPLIB(f'data/{dataset}.tsp')
+    # Pour chaque chemin exploré nous allons sauvegarder la figure associée
+    for index, chemin in enumerate(chemins_explores[0]):
+        df_meilleur_trajet = trajet_en_df(chemin, data)
+        fig = representation_itineraire_web(df_meilleur_trajet)
+        # Sauvegarde de la figure au format .png
+        fig.write_image("resultats/figures/{}/{}/{:05d}.png".format(
+            df_resolution['Algorithme'][0], dataset, index))
