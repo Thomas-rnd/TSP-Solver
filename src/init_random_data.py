@@ -17,7 +17,7 @@ def init_random_df(n: int) -> pd.DataFrame:
     Returns
     -------
     DataFrame
-        L'ensemble de ville ainsi crée
+        L'ensemble des villes ainsi crée
     """
     # Borne des coordonnées x et y des villes
     TAILLE_FENETRE = 1000
@@ -32,6 +32,6 @@ def init_random_df(n: int) -> pd.DataFrame:
             x.append(a)
             y.append(b)
     index = [a for a in range(len(x))]
-    # Initialisation du dataframe
+    # Création du dataframe
     data = pd.DataFrame({'Ville': index, 'x': x, 'y': y})
     return (data)

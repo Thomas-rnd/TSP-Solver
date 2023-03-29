@@ -3,15 +3,21 @@ import time
 import numpy as np
 import pandas as pd
 
-from src.affichage_resultats import (representation_itineraire_web,
-                                     representation_reseau)
+from src.affichage_resultats import representation_reseau
 from src.distance import distance_trajet, neurone_gagnant
 from src.init_test_data import normalisation
+
+# En s'inspirant des cours dispensés à l'ENSC en apprentissage automatique j'ai essayé
+# de mettre en place une carte auto-génératrice afin de résoudre le TSP.
+
+# Afin d'implémenter cette algorithme complexe je suis inspiré de recherches sur le sujet
+# Cf. https://github.com/diego-vicente/som-tsp
+# Cf. https://github.com/sdpython/ensae_teaching_cs/blob/be65e97cf24abf05cb3471f3989cb7c7d5938236/src/ensae_teaching_cs/special/tsp_kohonen.py#L202
 
 
 def creation_reseau(taille: int) -> np.ndarray:
     """
-    Création d'un réseau d'un taille donnée
+    Création d'un réseau d'un taille donnée. Le réseau est une suite 1D de neurones
 
     Parameters
     ----------
@@ -21,49 +27,50 @@ def creation_reseau(taille: int) -> np.ndarray:
     Returns
     -------
     np.ndarray
-        un ensemble de taille neurones de dimension 2 dans l'intervalle [0,1)
+        un vecteur de dimension `taille` composé de neurones à 2 dimension à valeur dans l'intervalle [0,1)
     """
     return np.random.rand(taille, 2)
 
 
 def voisinage(index_neuronne_gagnant: int, rayon: float, nombre_neurones: int) -> np.ndarray:
-    """Génération d'une gaussienne à valeur dans [0,1] centrée en index_neuronne_gagnant
-    et d'écart type rayon. Cette gaussienne permet de modéliser l'attirance du cycle de neuronne.
-    Cette fonction est periodique et de période le nombre_neurones.
+    """Génération d'une gaussienne à valeur dans [0,1] centrée en `index_neuronne_gagnant`
+    et d'écart type `rayon`. Cette gaussienne permet de modéliser l'attirance du cycle de neuronne.
+
+    Cette fonction est periodique et de période le nombre_neurones (attirance dans un cycle).
 
     Parameters
     ----------
     index_neuronne_gagnant : int 
         index du neuronne gagnant dans le réseaux de kohonen. Moyenne de la gaussienne
     rayon : float 
-        écart type de la gaussienne. (rayon d'influence du neuronne gagnant)
+        écart type de la gaussienne (rayon d'influence du neuronne gagnant)
     nombre_neurones : int
         nombre de neurones dans le réseau
 
     Returns
     -------
     np.ndarray
-        la gaussienne discrête modélisant l'attraction ainsi crée
+        la gaussienne discrête modélisant l'attraction dans le réseau de neurones
     """
 
-    # Impose an upper bound on the radix to prevent NaN and blocks
+    # L'écart type ne peut pas être inférieur 1 pour prévenir de valeurs NaN
     if rayon < 1:
         rayon = 1
 
-    # Distance entre les neurones de la chaine et le neurone gagnant
+    # Distance entre les neurones de la chaine et le neurone gagnant (en 1D on utilise la norme 1)
     deltas = np.absolute(index_neuronne_gagnant - np.arange(nombre_neurones))
+    # Ajout de la prise en compte du cycle dans le calcul des distances
     distances = np.minimum(deltas, nombre_neurones - deltas)
 
     # Génération de la distribution gaussienne autour du neurone gagnant
     return np.exp(-(distances*distances) / (2*(rayon*rayon)))  # type: ignore
 
 
-def chemin_final(villes: pd.DataFrame, neurones: np.ndarray) -> list:
+def chemin_final(villes: pd.DataFrame, neurones: np.ndarray) -> list[int]:
     """Recherche du chemin final trouvé par le réseau. 
 
-    Pour cela on atitre à chacune des villes son neurone gagnant et ensuite
-    on vient trier les villes dans le même ordre que l'ordre des neurones
-    Return the route computed by a network.
+    Pour cela on attribut à chacune des villes son neurone gagnant et ensuite
+    on vient trier les villes dans le même ordre que celui effectif dans le réseau
 
     Parameters
     ----------
@@ -78,6 +85,7 @@ def chemin_final(villes: pd.DataFrame, neurones: np.ndarray) -> list:
         dataframe final des villes ordonnées
     """
     villes['ordre'] = villes[['x', 'y']].apply(
+        # convertion en int et non plus intp
         lambda c: int(neurone_gagnant(neurones, c)),
         # 1 or 'columns': on applique la fonction à chaque ligne.
         axis=1, raw=True)
@@ -87,8 +95,8 @@ def chemin_final(villes: pd.DataFrame, neurones: np.ndarray) -> list:
     return list(np.append(route, route[0]))
 
 
-def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
-    """Résolution du TSP en utilisant une Self-Organizing Map
+def carte_auto_adaptatives(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8) -> tuple[list[int], float, list[np.ndarray]]:
+    """Résolution du TSP en utilisant une Cartes auto-adaptatives
 
     Parameters
     ----------
@@ -101,11 +109,12 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
 
     Returns
     -------
-    itineraire : list
+    itineraire : list[int]
         le chemin final trouvé
-    temps_calcul : int
+    temps_calcul : float
         temps necessaire à la résolution du problème
-
+    evolution_reseau : list[np.ndarray]
+        stockage de l'évolution du réseau de neurones
     """
     start_time = time.time()
 
@@ -113,21 +122,22 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
     villes = data.copy()
     villes[['x', 'y']] = normalisation(villes[['x', 'y']])
 
-    # La taille de la population de neuronne est 8 fois celle du nombre de villes
     # Hyperparamètre
+    # La taille de la population de neuronne est 8 fois celle du nombre de villes
     n = villes.shape[0]*8
     # Génération du réseau de neurones
     neurones = creation_reseau(n)
     # print('Réseau de {} neurones créé. On commence les itérations :'.format(n))
 
-    for i in range(iterations):
-        if not i % 100:
-            # Affichage d'un feeback de l'avancement (avec retour à la ligne)
-            # print('\t> Iteration {}/{}'.format(i, iterations), end="\r")
+    # Stockage de l'évolution du réseau de neurones
+    evolution_reseau = []
 
+    for i in range(1, iterations):
+        # Intervalle de sauvegarde du réseau
+        if not i % 1000:
             # Représentation de l'état du réseau
-            # representation_reseau(villes, neurones)
-            continue
+            # representation_reseau(villes, neurones).show()
+            evolution_reseau.append(neurones.copy())
 
         # On choisit une ville aléatoire. On retourne les valeurs de x et y
         ville = villes.sample(1)[['x', 'y']].values
@@ -154,46 +164,48 @@ def som(data: pd.DataFrame, iterations: int, taux_apprentissage=0.8):
             break
 
     itineraire = chemin_final(villes, neurones)
-    villes = villes.reindex(itineraire)
     temps_calcul = time.time() - start_time
 
-    return itineraire, temps_calcul
+    return itineraire, temps_calcul, evolution_reseau
 
 
-def main(data: pd.DataFrame, mat_distance: np.ndarray) -> pd.DataFrame:
+def main(data: pd.DataFrame, mat_distance: np.ndarray, nom_dataset="") -> tuple[pd.DataFrame, list[np.ndarray]]:
     """Lancement de l'algorithme de kohonen
 
     Parameters
     ----------
     data : DataFrame
-        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+        dataframe stockant l'intégralité des coordonnées des villes à parcourir
     matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
+    nom_dataset : str (optionnel)
+        nom du dataset à traiter
 
     Returns
     -------
-    Dataframe
+    df_resultat_test : Dataframe
         variable stockant un ensemble de variables importantes pour analyser
         l'algorithme
+    evolution_reseau : list
+        variable retraçant l'évolution du réseau de neurones
     """
-    # On récupère lechemin trouvé et le temps de résolution de l'algorithme
-    itineraire, temps_calcul = som(data, 100000)
-
-    # Dataframe final trouvé. On donne comme nouvel index à data la liste itinéraire
-    # solution = data.reindex(itineraire)
+    # Résolution du TSP
+    itineraire, temps_calcul, evolution_reseau = carte_auto_adaptatives(
+        data, 100000)
 
     # Calcul de la distance du trajet final trouvé par l'algorithme
     distance_chemin_sub_optimal = distance_trajet(itineraire, mat_distance)
 
     # Création du dataframe à retourner
+    # On inclut pas l'évolution du réseau pour pas sucharger le fichier csv de résultats
     df_resultat_test = pd.DataFrame({
-        'Algorithme': "Kohonen",
+        'Algorithme': "kohonen",
+        'Nom dataset': nom_dataset,
         'Nombre de villes': len(itineraire)-1,
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [itineraire],
-        # Distance du trajet final
         'Distance': distance_chemin_sub_optimal,
         'Temps de calcul (en s)': temps_calcul
     })
 
-    return df_resultat_test
+    return df_resultat_test, evolution_reseau

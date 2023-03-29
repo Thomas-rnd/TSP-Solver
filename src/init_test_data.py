@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+# Lien de téléchargement des fichier .tsp
 # http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/tsp/
 
 
@@ -11,13 +12,14 @@ def data_TSPLIB(fichier: str) -> pd.DataFrame:
 
     Parameters
     ----------
-    fichier : string 
-        nom du fichier à traiter
+    fichier : str
+        nom du fichier à traiter. Fichier dans le dossier `data`
 
     Returns
     -------
     DataFrame
-        L'ensemble des villes ainsi crées depuis le fichier .tsp
+        L'ensemble des villes ainsi crées depuis le fichier .tsp. Sous la forme 
+        `'Ville', 'x', 'y'`
     """
     with open(fichier) as f:
         noeud_coord_debut = None
@@ -37,7 +39,6 @@ def data_TSPLIB(fichier: str) -> pd.DataFrame:
         # On définit le point de référence au début du fichier
         f.seek(0)
 
-        # Read a data frame out of the file descriptor
         villes = pd.read_csv(
             f,
             # On commence la lecture du fichier au bon endroit
@@ -46,7 +47,7 @@ def data_TSPLIB(fichier: str) -> pd.DataFrame:
             sep=' ',
             # Définition des colonnes du dataframe
             names=['Ville', 'x', 'y'],
-            # Type des colonnes
+            # Définition du type des colonnes
             dtype={'Ville': str, 'x': np.float64, 'y': np.float64},
             header=None,
             nrows=dimension
@@ -55,8 +56,8 @@ def data_TSPLIB(fichier: str) -> pd.DataFrame:
         return villes
 
 
-def trajet_en_df(trajet: list, data: pd.DataFrame) -> pd.DataFrame:
-    """Convertion d'un trajet en un dataframe
+def trajet_en_df(trajet: list[int], data: pd.DataFrame) -> pd.DataFrame:
+    """Convertion d'un trajet en un dataframe afin de l'afficher simplement
 
     Parameters
     ----------
@@ -68,7 +69,7 @@ def trajet_en_df(trajet: list, data: pd.DataFrame) -> pd.DataFrame:
     Returns
     -------
     DataFrame
-        DataFrame ordonnées pour afficher le trajet
+        DataFrame ordonné pour afficher correctement le trajet trouvé
     """
     # Récupération des coordonnées des villes pour pouvoir les afficher
     x = []
@@ -84,19 +85,19 @@ def trajet_en_df(trajet: list, data: pd.DataFrame) -> pd.DataFrame:
 
 
 def normalisation(villes: pd.DataFrame) -> pd.Series:
-    """
-    Normalisation des coordonnées des villes afin de faciliter
+    """Normalisation des coordonnées des villes afin de faciliter
     l'apprentissage du réseau de neuronnes
 
     Parameters
     ----------
     villes : DataFrame
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+        sans la colonne `Ville`
 
     Returns
     -------
-    DataFrame
-        DataFrame normalisé
+    Series
+        Villes du dataframe normalisées
     """
     ratio = (villes.x.max() - villes.x.min()) / \
         (villes.y.max() - villes.y.min()), 1

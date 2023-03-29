@@ -17,14 +17,11 @@ POURCENTAGE_SELECTION = 10/100
 POURCENTAGE_MUTATION = 50/100
 
 # Constante permettant d'arrêter la convergence de l'algorithme
-ERREUR_SUR_CHEMIN = 25
-
-# Constante permettant d'arrêter la convergence de l'algorithme
 NOMBRE_EPOCH = 100
 
 
 def init_population(nombre_de_trajet: int, data: pd.DataFrame, matrice_distance: np.ndarray) -> list[dict]:
-    """Initialisation de la population initiale 
+    """Initialisation de la population initiale
 
     Construction d'une population initiale de N solutions.
     Une solution étant un trajet passant par toutes les villes une et une seule fois
@@ -40,10 +37,11 @@ def init_population(nombre_de_trajet: int, data: pd.DataFrame, matrice_distance:
 
     Returns
     -------
-    list(dict)
-        l'ensemble des N trajets distincts crées
+    list[dict]
+        l'ensemble des N trajets distincts crées avec dans le dictionnaire l'information sur
+        le chemin `Villes`et la distance `Distance`
     """
-    # Liste stockant la population
+    # Liste stockant la population initiale
     trajets = []
     for i in range(nombre_de_trajet):
         # Initialisation de la forme d'une solution. On instancie un nouveau dictionnaire
@@ -55,14 +53,14 @@ def init_population(nombre_de_trajet: int, data: pd.DataFrame, matrice_distance:
         # Le marchand revient sur ses pas donc ajout de la première ville à la fin
         # de la liste
         trajet['Villes'].append(trajet['Villes'][0])
-        # Calcul de la distance total du parcours
+        # Calcul de la distance totale du parcours
         trajet = evaluation(trajet, matrice_distance)
         trajets.append(trajet)
     return trajets
 
 
-def individus_ordonnes(trajets: list[dict]):
-    """Tri des trajts par ordre croissant de leur distance 
+def individus_ordonnes(trajets: list[dict]) -> list[dict]:
+    """Tri des trajts par ordre croissant de leur distance
 
     Parameters
     ----------
@@ -107,13 +105,13 @@ def probabilite(pourcentage: float) -> bool:
 
     Parameters
     ----------
-    pourcentage : int
+    pourcentage : float
         le pourcentage de succés
 
     Returns
     -------
     bool
-        Succés ou non succés
+        résultat
     """
     r = random.randint(0, 100)
     if r <= pourcentage:
@@ -124,21 +122,21 @@ def probabilite(pourcentage: float) -> bool:
 # Pour les mutations il est important de conserver l'intégrité de nos trajets. Le point initial est confondu
 # avec le point final. Le choix du point initial est arbitraire, il n'éxiste pas une première ville meilleur que les autres.
 # Prenant en compte ce principe, on n'effectura pas de permutation affectant les extrémités du trajet.
-def cadre_mutation(nombre_villes: int) -> list:
+def cadre_mutation(nombre_villes: int) -> list[int]:
     """Définition des villes pouvant permuter en fonction de la remarque précédente.
 
     Les villes qui peuvent permutter sont comprise entre la première et l'avant avant dernière
-    On permutte avec la ville suivante donc l'avant dernière permuterait avec la dernière ce qui 
+    On permutte avec la ville suivante donc l'avant dernière permuterait avec la dernière ce qui
     n'est pas possible
 
     Parameters
     ----------
     nombre_villes : int
-        nombre de ville à traverser 
+        nombre de ville à traverser
 
     Returns
     -------
-    list
+    list[int]
         index des villes qui peuvent muter
     """
     # Initialisation du cadre
@@ -167,12 +165,12 @@ def mutation_aleatoire(trajet: dict) -> dict:
     # Je ne veux pas modifier le trajet initial. Comme c'est un type référence
     # je réalise une copie particulière pour ne pas pointer vers la même adresse mémoire
     enfant['Villes'] = copy.deepcopy(trajet['Villes'])
-    # Indice des éléments à permuter cette fois ci ils ne sont pas forcément l'un après l'autre
+    # Indice des éléments à permuter
     r = random.sample(range(villes_mutables[0], villes_mutables[1]), 2)
     # Permutation des deux éléments
     enfant['Villes'][r[0]], enfant['Villes'][r[1]
                                              ] = enfant['Villes'][r[1]], enfant['Villes'][r[0]]
-    return (enfant)
+    return enfant
 
 
 def generation(trajets_originels: list[dict], nombre_de_trajet: int, pourcentage_mutation: float, matrice_distance: np.ndarray) -> list[dict]:
@@ -194,8 +192,8 @@ def generation(trajets_originels: list[dict], nombre_de_trajet: int, pourcentage
 
     Returns
     -------
-    list
-        L'ensemble des N trajets distincts crées
+    list[dict]
+        population complète
     """
     while len(trajets_originels) < nombre_de_trajet:
         for trajet in trajets_originels:
@@ -230,7 +228,7 @@ def evaluation(trajet: dict, matrice_distance: np.ndarray) -> dict:
     return maj_trajet
 
 
-def main(data: pd.DataFrame, matrice_distance: np.ndarray) -> pd.DataFrame:
+def main(data: pd.DataFrame, matrice_distance: np.ndarray, nom_dataset="") -> pd.DataFrame:
     """Lancement de l'algorithme de recherche 
 
     Parameters
@@ -239,6 +237,8 @@ def main(data: pd.DataFrame, matrice_distance: np.ndarray) -> pd.DataFrame:
         Dataframe stockant l'intégralité des coordonnées des villes à parcourir
     matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
+    nom_dataset : str (optionnel)
+        Nom du dataset à traiter
 
     Returns
     -------
@@ -275,11 +275,11 @@ def main(data: pd.DataFrame, matrice_distance: np.ndarray) -> pd.DataFrame:
 
     # Création du dataframe à retourner
     df_resultat_test = pd.DataFrame({
-        'Algorithme': "Génétique",
+        'Algorithme': "genetique",
+        'Nom dataset': nom_dataset,
         'Nombre de villes': len(solution)-1,
         # Dans un tableau pour être sur une seule ligne du dataframe
         'Solution': [solution],
-        # Distance du trajet final
         'Distance': distance,
         'Temps de calcul (en s)': temps_calcul
     })
