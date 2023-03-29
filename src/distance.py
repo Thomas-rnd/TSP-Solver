@@ -5,7 +5,7 @@ from scipy.spatial import distance
 
 def distance_euclidienne(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
-    Retourne un np.array des distances entre 2 np.array de points.
+    Retourne un vecteur des distances entre 2 vecteurs de points.
 
     Parameters
     ----------
@@ -30,7 +30,7 @@ def matrice_distance(villes: pd.DataFrame) -> np.ndarray:
     Parameters
     ----------
     villes : DataFrame
-        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+        dataframe stockant l'intégralité des coordonnées des villes à parcourir
 
     Returns
     -------
@@ -45,13 +45,13 @@ def matrice_distance(villes: pd.DataFrame) -> np.ndarray:
     return dist_matrice
 
 
-def distance_trajet(itineraire: list, matrice_distance: np.ndarray) -> float:
+def distance_trajet(itineraire: list[int], matrice_distance: np.ndarray) -> float:
     """Calcul de la distance totale d'un trajet
 
     Parameters
     ----------
-    itineraire : list
-        Liste ordonnées des villes parcourues
+    itineraire : list[int]
+        liste ordonnées des villes parcourues
     matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
 
