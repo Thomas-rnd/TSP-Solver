@@ -121,4 +121,8 @@ def test_unitaire(num_dataset: int, algo: str) -> tuple[pd.DataFrame, list]:
         df_res, exploration = src.algo_kohonen.main(
             data, mat_distance, ENSEMBLE_TEST[num_dataset])
 
+    # Sauvegarde au format .png du chemin final trouvé
+    affichage(df_res, data, nom_fichier="{}/chemin_{}".format(algo,
+              ENSEMBLE_TEST[num_dataset]))
+
     return df_res, exploration
