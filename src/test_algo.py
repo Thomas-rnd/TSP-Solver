@@ -67,7 +67,7 @@ def test_global(algorithme: str) -> pd.DataFrame:
     return df_resultat_test
 
 
-def test_unitaire(num_dataset: int, algo: str) -> tuple[pd.DataFrame, list[list[int]] | list[np.ndarray]]:
+def test_unitaire(num_dataset: int, algo: str) -> tuple[pd.DataFrame, list]:
     """Lancement d'un test unitaire pour un algorithme
 
     Parameters
