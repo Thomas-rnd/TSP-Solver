@@ -10,6 +10,8 @@ a widespread format in this problem. All the source code can be found in the
 
 The notebook will present how well an algorithm succeed to resolve the Travelling Salesman Problem (TSP).
 
+![Result exemple with the Self-Organizing Maps](https://github.com/Thomas-rnd/TSP_solver/blob/main/gif/kohonen_pka379.gif)
+
 ### Algorithm implemented
 
 - 2-opt inversion
