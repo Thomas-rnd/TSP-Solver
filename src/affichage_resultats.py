@@ -280,4 +280,4 @@ def generation_gif(algorithme: str, dataset: str):
         os.remove(image)
     # Feedback de la création du gif
     print(
-        f"Vous venez de créer le fichier '{algorithme}_{dataset}.gif' dans le dossier gif à la racine du projet")
+        f"Le gif est accessible ici : '/gif/{algorithme}_{dataset}.gif'")
