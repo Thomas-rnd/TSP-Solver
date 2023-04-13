@@ -10,9 +10,15 @@ from src.init_test_data import normalisation
 # En s'inspirant des cours dispensés à l'ENSC en apprentissage automatique j'ai essayé
 # de mettre en place une carte auto-génératrice afin de résoudre le TSP.
 
-# Afin d'implémenter cette algorithme complexe je suis inspiré de recherches sur le sujet
+# Afin d'implémenter cette algorithme complexe je suis inspiré de recherches sur le sujet. Ces recherches ont été cruciales
+# au tuning de mon modèle.
 # Cf. https://github.com/diego-vicente/som-tsp
 # Cf. https://github.com/sdpython/ensae_teaching_cs/blob/be65e97cf24abf05cb3471f3989cb7c7d5938236/src/ensae_teaching_cs/special/tsp_kohonen.py#L202
+
+# Nombre d'epoch maximal pour entrainer le réseau
+EPOCH_MAX = 100000
+# Hyperparamètre de mise à jour du taux d'apprenssage et de l'attraction du réseau
+HYPERPARAMETRE_ENTRAINEMENT = 0.99997
 
 
 def creation_reseau(taille: int) -> np.ndarray:
@@ -27,30 +33,31 @@ def creation_reseau(taille: int) -> np.ndarray:
     Returns
     -------
     np.ndarray
-        un vecteur de dimension `taille` composé de neurones à 2 dimension à valeur dans l'intervalle [0,1)
+        un vecteur de dimension `taille` composé de neurones à 2 dimensions à valeur dans l'intervalle [0,1)
     """
     return np.random.rand(taille, 2)
 
 
 def voisinage(index_neuronne_gagnant: int, rayon: float, nombre_neurones: int) -> np.ndarray:
     """Génération d'une gaussienne à valeur dans [0,1] centrée en `index_neuronne_gagnant`
-    et d'écart type `rayon`. Cette gaussienne permet de modéliser l'attirance du cycle de neuronne.
+    et d'écart type `rayon`. Cette gaussienne permet de modéliser l'attirance à l'intérieur
+    du cycle de neuronne.
 
     Cette fonction est periodique et de période le nombre_neurones (attirance dans un cycle).
 
     Parameters
     ----------
     index_neuronne_gagnant : int 
-        index du neuronne gagnant dans le réseaux de kohonen. Moyenne de la gaussienne
+        index du neuronne gagnant du réseaux de kohonen (Moyenne de la gaussienne)
     rayon : float 
-        écart type de la gaussienne (rayon d'influence du neuronne gagnant)
+        rayon d'influence du neuronne gagnant (écart type de la gaussienne)
     nombre_neurones : int
         nombre de neurones dans le réseau
 
     Returns
     -------
     np.ndarray
-        la gaussienne discrête modélisant l'attraction dans le réseau de neurones
+        la gaussienne discrête modélise l'attraction dans le réseau de neurones
     """
 
     # L'écart type ne peut pas être inférieur 1 pour prévenir de valeurs NaN
@@ -75,7 +82,7 @@ def chemin_final(villes: pd.DataFrame, neurones: np.ndarray) -> list[int]:
     Parameters
     ----------
     villes : DataFrame 
-        Dataframe stockant l'intégralité des coordonnées des villes à parcourir
+        dataframe stockant l'intégralité des coordonnées des villes à parcourir
     neurones : np.ndarray 
         un ensemble de neuronnes de dimension 2 dans l'intervalle [0,1)
 
@@ -139,19 +146,19 @@ def carte_auto_adaptatives(data: pd.DataFrame, iterations: int, taux_apprentissa
             # representation_reseau(villes, neurones).show()
             evolution_reseau.append(neurones.copy())
 
-        # On choisit une ville aléatoire. On retourne les valeurs de x et y
+        # On choisit une ville aléatoire. On retourne ses coordonnées
         ville = villes.sample(1)[['x', 'y']].values
         index_gagnant = neurone_gagnant(neurones, ville)
-        # Génération d'un filtre gaussien modélisant l'attraction entre un neurone et ses voisins
+        # Génération d'un filtre gaussien modélisant l'attraction entre un le neurone gagnant et ses voisins
         gaussian = voisinage(int(index_gagnant), n//10, neurones.shape[0])
         # Mise à jour des poids des neurones (proche de la ville initiale)
         # np.newaxis pour contrôler le broadcasting
         neurones += gaussian[:, np.newaxis] * \
             taux_apprentissage * (ville - neurones)
         # Mise à jour du taux d'apprentissage
-        taux_apprentissage = taux_apprentissage * 0.99997
+        taux_apprentissage = taux_apprentissage * HYPERPARAMETRE_ENTRAINEMENT
         # Réduction de la distance d'influence d'un neurone
-        n = n * 0.9997
+        n = n * HYPERPARAMETRE_ENTRAINEMENT
 
         # Si un des paramètres a trop diminué
         if n < 1:
@@ -191,7 +198,7 @@ def main(data: pd.DataFrame, mat_distance: np.ndarray, nom_dataset="") -> tuple[
     """
     # Résolution du TSP
     itineraire, temps_calcul, evolution_reseau = carte_auto_adaptatives(
-        data, 100000)
+        data, EPOCH_MAX)
 
     # Calcul de la distance du trajet final trouvé par l'algorithme
     distance_chemin_sub_optimal = distance_trajet(itineraire, mat_distance)

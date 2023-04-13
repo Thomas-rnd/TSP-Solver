@@ -1,6 +1,11 @@
 import numpy as np
 import pandas as pd
 
+
+# Pour favoriser la réutilisation par la comunauté scientifique
+# les tests des algorithmes implémentés peuvent être réalisées sur
+# les données officielles de ce problème.
+
 # Lien de téléchargement des fichier .tsp
 # http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/tsp/
 

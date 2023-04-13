@@ -7,6 +7,9 @@ import pandas as pd
 
 from src.distance import distance_trajet
 
+# En s'inspirant des cours dispensés à l'ENSC en apprentissage automatique j'ai essayé
+# de mettre en place la résolution du TSP via une évolution aléatoire de population.
+
 # Taille de la population initiale
 NOMBRE_TRAJET = 100
 
@@ -39,7 +42,7 @@ def init_population(nombre_de_trajet: int, data: pd.DataFrame, matrice_distance:
     -------
     list[dict]
         l'ensemble des N trajets distincts crées avec dans le dictionnaire l'information sur
-        le chemin `Villes`et la distance `Distance`
+        le chemin `Villes` et la distance `Distance`
     """
     # Liste stockant la population initiale
     trajets = []
@@ -60,7 +63,7 @@ def init_population(nombre_de_trajet: int, data: pd.DataFrame, matrice_distance:
 
 
 def individus_ordonnes(trajets: list[dict]) -> list[dict]:
-    """Tri des trajts par ordre croissant de leur distance
+    """Tri des trajets par ordre croissant de leur distance
 
     Parameters
     ----------
@@ -76,7 +79,7 @@ def individus_ordonnes(trajets: list[dict]) -> list[dict]:
 
 
 def selection(trajets: list[dict], pourcentage: float) -> list[dict]:
-    """Sélection des n meilleurs
+    """Sélection des N meilleurs
 
     Parmi la population totale on ne conserve qu'un petit pourcentage
     de la population
@@ -91,11 +94,11 @@ def selection(trajets: list[dict], pourcentage: float) -> list[dict]:
     Returns
     -------
     list[dict]
-        les n meilleurs de la population initiale
+        les N meilleurs de la population initiale
     """
     # Nombre de trajet après sélection
     nombre_selectionne = int(len(trajets)*pourcentage)
-    # Récupération de ces n trajets
+    # Récupération de ces n trajets dans la liste ordonnées
     trajets = trajets[:nombre_selectionne]
     return trajets
 
@@ -120,12 +123,12 @@ def probabilite(pourcentage: float) -> bool:
 
 
 # Pour les mutations il est important de conserver l'intégrité de nos trajets. Le point initial est confondu
-# avec le point final. Le choix du point initial est arbitraire, il n'éxiste pas une première ville meilleur que les autres.
+# avec le point final. Le choix du point initial est arbitraire, il n'existe pas une première ville meilleur que les autres.
 # Prenant en compte ce principe, on n'effectura pas de permutation affectant les extrémités du trajet.
 def cadre_mutation(nombre_villes: int) -> list[int]:
     """Définition des villes pouvant permuter en fonction de la remarque précédente.
 
-    Les villes qui peuvent permutter sont comprise entre la première et l'avant avant dernière
+    Les villes qui peuvent permutter sont comprise entre la deuxième et l'avant avant dernière
     On permutte avec la ville suivante donc l'avant dernière permuterait avec la dernière ce qui
     n'est pas possible
 
@@ -162,8 +165,8 @@ def mutation_aleatoire(trajet: dict) -> dict:
     # Création d'un nouveau dictionnaire pour stocker le trajet muté
     enfant = {'Villes': [], 'Distance': 0}
     villes_mutables = cadre_mutation(len(trajet['Villes']))
-    # Je ne veux pas modifier le trajet initial. Comme c'est un type référence
-    # je réalise une copie particulière pour ne pas pointer vers la même adresse mémoire
+    # On ne veux pas modifier le trajet initial. Comme c'est un type référence
+    # on réalise une copie particulière pour ne pas pointer vers la même adresse mémoire
     enfant['Villes'] = copy.deepcopy(trajet['Villes'])
     # Indice des éléments à permuter
     r = random.sample(range(villes_mutables[0], villes_mutables[1]), 2)
@@ -238,7 +241,7 @@ def main(data: pd.DataFrame, matrice_distance: np.ndarray, nom_dataset="") -> pd
     matrice_distance : np.ndarray
         matrice stockant l'integralité des distances inter villes
     nom_dataset : str (optionnel)
-        Nom du dataset à traiter
+        nom du dataset à traiter
 
     Returns
     -------
@@ -255,7 +258,7 @@ def main(data: pd.DataFrame, matrice_distance: np.ndarray, nom_dataset="") -> pd
     # Evaluation du temps de calcul
     start = time.time()
     # On arrete l'algorithme après un nombre d'epoch fixé. Pour permettre de visualiser
-    # un résultat même si l'algorithme ne converge pas (ou pas assez vite).
+    # un résultat même si la solution est moyenne.
     while epoch <= NOMBRE_EPOCH:
         epoch += 1
         # Tri

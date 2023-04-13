@@ -5,6 +5,12 @@ import pandas as pd
 
 from src.distance import distance_trajet
 
+# Implémentation de l'algorithme du 1-plus proche voisin adapté à la résolution
+# du TSP. C'est un algorithme simple afin d'obtenir très rapidement une solution
+# approximative et non aléatoire au problème.
+
+# Cf. : https://fr.wikipedia.org/wiki/Recherche_des_plus_proches_voisins
+
 
 def plus_proche_voisin(matrice_distance: np.ndarray) -> tuple[list[int], float, list[list[int]]]:
     """Retourne le trajet trouvé en se déplacement de proche en proche.
@@ -60,7 +66,7 @@ def plus_proche_voisin(matrice_distance: np.ndarray) -> tuple[list[int], float, 
         # référence des listes
         chemins_explores.append(itineraire.copy())
 
-    # On tâche de fermer le cycle
+    # On pense à fermer le cycle
     itineraire.append(itineraire[0])
 
     temps_calcul = time.time() - start_time

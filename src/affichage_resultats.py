@@ -10,6 +10,7 @@ from PIL import Image
 from src.init_test_data import data_TSPLIB, normalisation, trajet_en_df
 
 # Chemin de stockage des différents fichiers numériques
+# On retrouve dans ce dossier l'ensemble des figures crées
 ROOT = "resultats/figures/"
 
 
@@ -88,7 +89,7 @@ def representation_reseau(data: pd.DataFrame, neurones: np.ndarray, nom_fichier=
 
 def representation_temps_calcul(fichier_csv: str) -> go.Figure:
     """Affichage du temps de calcul des différents algorithmes implémentés
-    en fonction du nombre de villes à parcourir
+    en fonction du nombre de villes à parcourir.
 
     Parameters
     ----------
@@ -102,9 +103,6 @@ def representation_temps_calcul(fichier_csv: str) -> go.Figure:
     """
     # Lecture du fichier stockant l'ensemble des résultats
     data = pd.read_csv(fichier_csv)
-    # fig = px.scatter(data, x='Nombre de villes',
-    #              y='ln(Temps de calcul (en s))', color='Algorithme',
-    #              title='Représentation du temps de calcul en fonction du nombre de ville à explorer', trendline="ols")
     fig = px.line(data, x='Nombre de villes',
                   y='Temps de calcul (en s)', color='Algorithme', template='plotly_white',
                   title='Representation of the calculation time according to the number of cities to explore', markers=True, log_y=True,
@@ -181,9 +179,11 @@ def affichage(df_resolution: pd.DataFrame, data: pd.DataFrame, nom_fichier="") -
     # Création d'un dataframe complet issu de la solution trouvée
     df_meilleur_trajet = trajet_en_df(
         df_resolution['Solution'][0], data)
+    # Création de la figure avec sauvegarde
     if nom_fichier != "":
         fig = representation_itineraire_web(
             data, df_meilleur_trajet, f"{ROOT+nom_fichier}.png")
+    # Création de la figure sans sauvegarde
     else:
         fig = representation_itineraire_web(
             data, df_meilleur_trajet)
@@ -199,7 +199,7 @@ def affichage(df_resolution: pd.DataFrame, data: pd.DataFrame, nom_fichier="") -
 
 
 def affichage_chemins_explores(exploration: list[list[int]], algorithme: str, dataset: str):
-    """Sauvegarde des chemins explorés au format `.png` par un algorithme 
+    """Sauvegarde des figures des trajets explorés au format `.png` par un algorithme 
 
     Parameters
     ----------
@@ -219,8 +219,8 @@ def affichage_chemins_explores(exploration: list[list[int]], algorithme: str, da
     data = data_TSPLIB(f'data/{dataset}.tsp')
     # Pour chaque chemin exploré nous allons sauvegarder la figure associée
     for index, chemin in enumerate(exploration):
-        df_meilleur_trajet = trajet_en_df(chemin, data)
-        fig = representation_itineraire_web(data, df_meilleur_trajet)
+        df_trajet_explore = trajet_en_df(chemin, data)
+        fig = representation_itineraire_web(data, df_trajet_explore)
         # Sauvegarde de la figure au format .png
         fig.write_image("{}{}/{}/{:05d}.png".format(ROOT,
                                                     algorithme, dataset, index))
@@ -245,10 +245,10 @@ def affichage_reseau_neurones(exploration: list[np.ndarray], algorithme: str, da
 
     # On génère le dataframe associé à ce dataset
     data = data_TSPLIB(f'data/{dataset}.tsp')
-    # On crée des villes artificielles normalisées pour être en cohérence avec le domain des poids des neurones [0,1]
+    # On crée des villes artificielles normalisées pour être en cohérence avec le domaine des poids des neurones [0,1]
     villes = data.copy()
     villes[['x', 'y']] = normalisation(villes[['x', 'y']])
-    # Pour chaque chemin exploré nous allons sauvegarder la figure associée
+    # Pour chaque orgnisation du réseau nous allons sauvegarder la figure associée
     for index, reseau in enumerate(exploration):
         fig = representation_reseau(villes, reseau)
         # Sauvegarde de la figure au format .png
@@ -257,7 +257,7 @@ def affichage_reseau_neurones(exploration: list[np.ndarray], algorithme: str, da
 
 
 def generation_gif(algorithme: str, dataset: str):
-    """Génération du fichier `.gif` pour nous permettre de bien visualiser le fonctionnemnt 
+    """Génération d'un fichier `.gif` pour nous permettre de bien visualiser le fonctionnemnt 
     d'un algorithme
 
     Parameters
@@ -267,10 +267,11 @@ def generation_gif(algorithme: str, dataset: str):
     dataset : str 
         nom du dataset à traiter
     """
-    # Récupération de toutes les images du dossier de manière ordonné
+    # Récupération de toutes les images à fusionner du dossier de manière ordonné
     dossier_images = '{}/{}/'.format(algorithme, dataset)
     images = [Image.open("{}{}/{}".format(ROOT, dossier_images, image))
               for image in sorted(os.listdir(ROOT+dossier_images))]
+    # Définition de la première image du GIF
     premiere_image = images[0]
     premiere_image.save(f"gif/{algorithme}_{dataset}.gif", format="GIF", append_images=images,
                         save_all=True, duration=200, loop=0)
