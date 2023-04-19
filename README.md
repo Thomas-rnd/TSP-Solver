@@ -32,6 +32,7 @@ Then create a virtual environment with conda then activate it. For more details 
 
 ```
 conda create -n <env_name> -c conda-forge dash jupyter matplotlib-inline numpy pandas pillow plotly python-kaleido python scipy 
+conda activate <env_name>
 ```
 
 Or
