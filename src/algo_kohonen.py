@@ -17,8 +17,6 @@ from src.init_test_data import normalisation
 
 # Nombre d'epoch maximal pour entrainer le réseau
 EPOCH_MAX = 100000
-# Hyperparamètre de mise à jour du taux d'apprenssage et de l'attraction du réseau
-HYPERPARAMETRE_ENTRAINEMENT = 0.99997
 
 
 def creation_reseau(taille: int) -> np.ndarray:
@@ -156,9 +154,9 @@ def carte_auto_adaptatives(data: pd.DataFrame, iterations: int, taux_apprentissa
         neurones += gaussian[:, np.newaxis] * \
             taux_apprentissage * (ville - neurones)
         # Mise à jour du taux d'apprentissage
-        taux_apprentissage = taux_apprentissage * HYPERPARAMETRE_ENTRAINEMENT
+        taux_apprentissage = taux_apprentissage * 0.99997
         # Réduction de la distance d'influence d'un neurone
-        n = n * HYPERPARAMETRE_ENTRAINEMENT
+        n = n * 0.9997
 
         # Si un des paramètres a trop diminué
         if n < 1:
